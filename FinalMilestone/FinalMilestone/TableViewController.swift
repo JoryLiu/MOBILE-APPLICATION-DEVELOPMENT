@@ -76,7 +76,13 @@ class TableViewController: UITableViewController, toDoListProtocol {
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         let dvc = segue.destination as! ViewController
-        
+        let cell = sender as! UITableViewCell
+        let indexPath :IndexPath = tableView.indexPath(for: cell)!
+        indexOfSelectedItem = indexPath.row
+        if let i = indexOfSelectedItem {
+            dvc.indexOfSelectedItem = i
+            dvc.selectedItem = toDoList[i]
+        }
     }
     
     func save() {

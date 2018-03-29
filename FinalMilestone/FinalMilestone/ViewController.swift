@@ -14,10 +14,18 @@ class ViewController: UIViewController, UITextFieldDelegate {
     @IBOutlet weak var mySwitch: UISwitch!
     @IBOutlet weak var myDatePicker: UIDatePicker!
     
+    var indexOfSelectedItem: Int?
+    var selectedItem: toDoListItem?
+    
     override func viewDidLoad() {
         super.viewDidLoad()
 
         // Do any additional setup after loading the view.
+        guard indexOfSelectedItem != nil else {
+            return
+        }
+        myTextField.text = selectedItem?.description
+        
     }
 
     override func didReceiveMemoryWarning() {
