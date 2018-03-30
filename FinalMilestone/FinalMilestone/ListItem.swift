@@ -11,14 +11,14 @@ import Foundation
 class toDoListItem {
     var description: String
     var dueDate: Date?
-    var beChecked: Bool
+    var isChecked: Bool
     var hasADue: Bool
     
     init(description: String, dueDate: Date? = nil,
-         beChecked: Bool = false, hasADue: Bool = false) {
+         isChecked: Bool = false, hasADue: Bool = false) {
         self.description = description
         self.dueDate = dueDate
-        self.beChecked = beChecked
+        self.isChecked = isChecked
         self.hasADue = hasADue
     }
 }

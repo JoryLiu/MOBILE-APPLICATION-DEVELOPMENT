@@ -17,15 +17,36 @@ class ViewController: UIViewController, UITextFieldDelegate {
     var indexOfSelectedItem: Int?
     var selectedItem: toDoListItem?
     
+    private var isCanceled: Bool = false
+    var delegator: toDoListProtocol?
+    
     override func viewDidLoad() {
         super.viewDidLoad()
+        myDatePicker.minimumDate = Date()
 
         // Do any additional setup after loading the view.
         guard indexOfSelectedItem != nil else {
             return
         }
         myTextField.text = selectedItem?.description
-        
+        if (selectedItem?.hasADue)! {
+            mySwitch.isOn = true
+            myDatePicker.date = (selectedItem?.dueDate)!
+        } else {
+            mySwitch.isOn = false
+            myDatePicker.isEnabled = false
+        }
+        isCanceled = false
+    }
+    
+    override func viewDidDisappear(_ animated: Bool) {
+        if !isCanceled {
+            guard let text = myTextField.text else {
+                return
+            }
+            delegator?.save(indexOfSelectedItem: indexOfSelectedItem, selectedItem: selectedItem,
+                            description: text, hasADue: mySwitch.isOn, dueDate: myDatePicker.date)
+        }
     }
 
     override func didReceiveMemoryWarning() {
@@ -38,4 +59,11 @@ class ViewController: UIViewController, UITextFieldDelegate {
         return true;
     }
 
+    @IBAction func enableOrDisableDue(_ sender: UISwitch) {
+        myDatePicker.isEnabled = mySwitch.isOn ? true : false
+    }
+    
+    @IBAction func cancelEditing(_ sender: UIBarButtonItem) {
+        isCanceled = true
+    }
 }

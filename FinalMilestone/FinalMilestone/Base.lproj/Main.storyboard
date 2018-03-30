@@ -102,6 +102,9 @@
                             </textField>
                             <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" translatesAutoresizingMaskIntoConstraints="NO" id="kDz-aH-RhK">
                                 <rect key="frame" x="312" y="183" width="51" height="31"/>
+                                <connections>
+                                    <action selector="enableOrDisableDue:" destination="n2Y-FK-6zq" eventType="valueChanged" id="mOr-qu-9rd"/>
+                                </connections>
                             </switch>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Due:" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="pg1-Un-sND">
                                 <rect key="frame" x="16" y="188" width="42" height="21"/>
@@ -134,7 +137,11 @@
                     </view>
                     <toolbarItems/>
                     <navigationItem key="navigationItem" title="Edit" id="bMf-hO-djv">
-                        <barButtonItem key="rightBarButtonItem" systemItem="cancel" id="Jqy-go-gkG"/>
+                        <barButtonItem key="rightBarButtonItem" systemItem="cancel" id="Jqy-go-gkG">
+                            <connections>
+                                <action selector="cancelEditing:" destination="n2Y-FK-6zq" id="ZJX-xq-Od1"/>
+                            </connections>
+                        </barButtonItem>
                     </navigationItem>
                     <simulatedToolbarMetrics key="simulatedBottomBarMetrics"/>
                     <connections>

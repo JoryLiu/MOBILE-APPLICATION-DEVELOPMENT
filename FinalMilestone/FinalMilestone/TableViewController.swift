@@ -28,13 +28,13 @@ class TableViewController: UITableViewController, toDoListProtocol {
     
     func initialization() {
         toDoList.append(toDoListItem(description: "Buy Bread"))
-        toDoList.append(toDoListItem(description: "Buy Milk", beChecked: true))
+        toDoList.append(toDoListItem(description: "Buy Milk", isChecked: true))
         toDoList.append(toDoListItem(description: "Buy Veggies"))
         let temp = "2018-3-29"
         let dateformatter = DateFormatter()
         dateformatter.dateFormat = "YYYY-MM-dd"
         let newDate = dateformatter.date(from: temp)
-        toDoList.append(toDoListItem(description: "Finish Assignment", dueDate: newDate, beChecked: false, hasADue: true))
+        toDoList.append(toDoListItem(description: "Finish Assignment", dueDate: newDate, isChecked: false, hasADue: true))
     }
 
     override func didReceiveMemoryWarning() {
@@ -68,25 +68,38 @@ class TableViewController: UITableViewController, toDoListProtocol {
         } else {
             cell.detailTextLabel?.text = ""
         }
-        cell.accessoryType = toDoList[i].beChecked ? .checkmark : .none
-        //cell.textLabel?.text = toDoList[i]
+        cell.accessoryType = toDoList[i].isChecked ? .checkmark : .none
         
         return cell
     }
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         let dvc = segue.destination as! ViewController
+        if sender is UIBarButtonItem {
+            return
+        }
         let cell = sender as! UITableViewCell
-        let indexPath :IndexPath = tableView.indexPath(for: cell)!
+        let indexPath: IndexPath = tableView.indexPath(for: cell)!
         indexOfSelectedItem = indexPath.row
         if let i = indexOfSelectedItem {
             dvc.indexOfSelectedItem = i
             dvc.selectedItem = toDoList[i]
+            dvc.delegator = self
         }
     }
     
-    func save() {
-        
+    func save(indexOfSelectedItem: Int?, selectedItem: toDoListItem?,
+              description: String, hasADue: Bool, dueDate: Date?) {
+        guard let i = indexOfSelectedItem else {
+            toDoList.append(toDoListItem(description: description, dueDate: dueDate, isChecked: false, hasADue: hasADue))
+            return
+        }
+        toDoList[i].description = description
+        toDoList[i].hasADue = hasADue
+        if hasADue {
+            toDoList[i].dueDate = dueDate
+        }
+        tableView.reloadData()
     }
     
     func cancle(_ dvc: ViewController) {

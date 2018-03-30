@@ -12,6 +12,7 @@ protocol toDoListProtocol {
     var indexOfSelectedItem: Int? { get }
     var selectedItem: toDoListItem? { get }
     
-    func save()
+    func save(indexOfSelectedItem: Int?, selectedItem: toDoListItem?,
+              description: String, hasADue: Bool, dueDate: Date?)
     func cancle(_ dvc: ViewController)
 }
