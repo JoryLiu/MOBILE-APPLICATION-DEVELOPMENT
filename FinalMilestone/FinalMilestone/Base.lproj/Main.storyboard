@@ -139,7 +139,7 @@
                     <navigationItem key="navigationItem" title="Edit" id="bMf-hO-djv">
                         <barButtonItem key="rightBarButtonItem" systemItem="cancel" id="Jqy-go-gkG">
                             <connections>
-                                <action selector="cancelEditing:" destination="n2Y-FK-6zq" id="ZJX-xq-Od1"/>
+                                <action selector="cancelEditing:" destination="n2Y-FK-6zq" id="2Vx-Rl-GAj"/>
                             </connections>
                         </barButtonItem>
                     </navigationItem>

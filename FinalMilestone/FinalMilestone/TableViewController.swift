@@ -75,6 +75,7 @@ class TableViewController: UITableViewController, toDoListProtocol {
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         let dvc = segue.destination as! ViewController
+        dvc.delegator = self
         if sender is UIBarButtonItem {
             return
         }
@@ -84,7 +85,6 @@ class TableViewController: UITableViewController, toDoListProtocol {
         if let i = indexOfSelectedItem {
             dvc.indexOfSelectedItem = i
             dvc.selectedItem = toDoList[i]
-            dvc.delegator = self
         }
     }
     
@@ -92,6 +92,7 @@ class TableViewController: UITableViewController, toDoListProtocol {
               description: String, hasADue: Bool, dueDate: Date?) {
         guard let i = indexOfSelectedItem else {
             toDoList.append(toDoListItem(description: description, dueDate: dueDate, isChecked: false, hasADue: hasADue))
+            tableView.reloadData()
             return
         }
         toDoList[i].description = description
@@ -105,6 +106,12 @@ class TableViewController: UITableViewController, toDoListProtocol {
     func cancle(_ dvc: ViewController) {
         
     }
+    
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        let i = indexPath.row
+        toDoList[i].isChecked = !(toDoList[i].isChecked)
+        tableView.reloadData()
+    }
 
     /*
     // Override to support conditional editing of the table view.
@@ -114,24 +121,28 @@ class TableViewController: UITableViewController, toDoListProtocol {
     }
     */
 
-    /*
     // Override to support editing the table view.
     override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCellEditingStyle, forRowAt indexPath: IndexPath) {
         if editingStyle == .delete {
             // Delete the row from the data source
-            tableView.deleteRows(at: [indexPath], with: .fade)
+            //tableView.deleteRows(at: [indexPath], with: .fade)
+            let i = indexPath.row
+            toDoList.remove(at: i)
+            tableView.reloadData()
         } else if editingStyle == .insert {
             // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view
         }    
     }
-    */
 
-    /*
     // Override to support rearranging the table view.
     override func tableView(_ tableView: UITableView, moveRowAt fromIndexPath: IndexPath, to: IndexPath) {
-
+        let from = fromIndexPath.row
+        let dest = to.row
+        let temp = toDoList[from]
+        toDoList.remove(at: from)
+        toDoList.insert(temp, at: dest)
+        tableView.reloadData()
     }
-    */
 
     /*
     // Override to support conditional rearranging of the table view.

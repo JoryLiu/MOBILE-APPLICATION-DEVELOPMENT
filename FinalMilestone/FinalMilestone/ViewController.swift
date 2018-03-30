@@ -26,6 +26,8 @@ class ViewController: UIViewController, UITextFieldDelegate {
 
         // Do any additional setup after loading the view.
         guard indexOfSelectedItem != nil else {
+            mySwitch.isOn = false
+            myDatePicker.isEnabled = false
             return
         }
         myTextField.text = selectedItem?.description
@@ -39,13 +41,13 @@ class ViewController: UIViewController, UITextFieldDelegate {
         isCanceled = false
     }
     
-    override func viewDidDisappear(_ animated: Bool) {
+    override func viewWillDisappear(_ animated: Bool) {
         if !isCanceled {
-            guard let text = myTextField.text else {
+            guard myTextField.text != "" else {
                 return
             }
             delegator?.save(indexOfSelectedItem: indexOfSelectedItem, selectedItem: selectedItem,
-                            description: text, hasADue: mySwitch.isOn, dueDate: myDatePicker.date)
+                            description: myTextField.text!, hasADue: mySwitch.isOn, dueDate: myDatePicker.date)
         }
     }
 
@@ -65,5 +67,7 @@ class ViewController: UIViewController, UITextFieldDelegate {
     
     @IBAction func cancelEditing(_ sender: UIBarButtonItem) {
         isCanceled = true
+        self.navigationController?.popViewController(animated: true)
     }
+    
 }
