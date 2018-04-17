@@ -2,7 +2,7 @@
 //  ViewController.swift
 //  FinalMilestone
 //
-//  Created by 刘钊睿 on 2018/3/27.
+//  Created by 刘钊睿(Zhaorui Liu s5121594) on 2018/3/27.
 //  Copyright © 2018年 Griffith University. All rights reserved.
 //
 
@@ -24,7 +24,7 @@ class ViewController: UIViewController, UITextFieldDelegate {
         super.viewDidLoad()
         myDatePicker.minimumDate = Date()
 
-        // Do any additional setup after loading the view.
+        // Show infomation if it's in editing mode
         guard indexOfSelectedItem != nil else {
             mySwitch.isOn = false
             myDatePicker.isEnabled = false
@@ -42,7 +42,7 @@ class ViewController: UIViewController, UITextFieldDelegate {
     }
     
     override func viewWillDisappear(_ animated: Bool) {
-        if !isCanceled {
+        if !isCanceled { // Save changes if discription is not empty
             guard myTextField.text != "" else {
                 return
             }
@@ -57,6 +57,7 @@ class ViewController: UIViewController, UITextFieldDelegate {
     }
     
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        // To make keyboard disappear
         textField.resignFirstResponder()
         return true;
     }
@@ -66,6 +67,7 @@ class ViewController: UIViewController, UITextFieldDelegate {
     }
     
     @IBAction func cancelEditing(_ sender: UIBarButtonItem) {
+        // If cancle button hit, go to previous page
         isCanceled = true
         self.navigationController?.popViewController(animated: true)
     }

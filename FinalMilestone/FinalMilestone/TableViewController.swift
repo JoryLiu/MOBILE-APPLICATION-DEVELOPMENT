@@ -2,7 +2,7 @@
 //  TableViewController.swift
 //  FinalMilestone
 //
-//  Created by 刘钊睿 on 2018/3/25.
+//  Created by 刘钊睿(Zhaorui Liu s5121594) on 2018/3/25.
 //  Copyright © 2018年 Griffith University. All rights reserved.
 //
 
@@ -22,11 +22,11 @@ class TableViewController: UITableViewController, toDoListProtocol {
         // self.clearsSelectionOnViewWillAppear = false
 
         // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
-        self.navigationItem.leftBarButtonItem = self.editButtonItem
+        self.navigationItem.leftBarButtonItem = self.editButtonItem // To show edit button
         initialization()
     }
     
-    func initialization() {
+    func initialization() { // initialize with some examples
         toDoList.append(toDoListItem(description: "Buy Bread"))
         toDoList.append(toDoListItem(description: "Buy Milk", isChecked: true))
         toDoList.append(toDoListItem(description: "Buy Veggies"))
@@ -46,21 +46,21 @@ class TableViewController: UITableViewController, toDoListProtocol {
 
     override func numberOfSections(in tableView: UITableView) -> Int {
         // #warning Incomplete implementation, return the number of sections
-        return 1
+        return 1 // There's only one section
     }
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         // #warning Incomplete implementation, return the number of rows
-        return toDoList.count
+        return toDoList.count // Number of rows equals the number of items
     }
 
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "Cell", for: indexPath)
+        let cell = tableView.dequeueReusableCell(withIdentifier: "Cell", for: indexPath) // Get the cell with identifier
 
         // Configure the cell...
-        let i = indexPath.row
-        cell.textLabel?.text = toDoList[i].description;
-        if toDoList[i].hasADue {
+        let i = indexPath.row // Get the index to position the corresponding item
+        cell.textLabel?.text = toDoList[i].description; // To show the description
+        if toDoList[i].hasADue { // If it has a due date, show it
             let dateformatter = DateFormatter()
             dateformatter.dateStyle = .short
             dateformatter.timeStyle = .none
@@ -68,21 +68,21 @@ class TableViewController: UITableViewController, toDoListProtocol {
         } else {
             cell.detailTextLabel?.text = ""
         }
-        cell.accessoryType = toDoList[i].isChecked ? .checkmark : .none
+        cell.accessoryType = toDoList[i].isChecked ? .checkmark : .none // If it's checked, show it
         
         return cell
     }
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        let dvc = segue.destination as! ViewController
+        let dvc = segue.destination as! ViewController // Set the destination of the segue
         dvc.delegator = self
-        if sender is UIBarButtonItem {
+        if sender is UIBarButtonItem { // To make sure the sender is a UITableViewCell
             return
         }
         let cell = sender as! UITableViewCell
         let indexPath: IndexPath = tableView.indexPath(for: cell)!
         indexOfSelectedItem = indexPath.row
-        if let i = indexOfSelectedItem {
+        if let i = indexOfSelectedItem { // Sotre infomation
             dvc.indexOfSelectedItem = i
             dvc.selectedItem = toDoList[i]
         }
@@ -90,11 +90,12 @@ class TableViewController: UITableViewController, toDoListProtocol {
     
     func save(indexOfSelectedItem: Int?, selectedItem: toDoListItem?,
               description: String, hasADue: Bool, dueDate: Date?) {
-        guard let i = indexOfSelectedItem else {
+        guard let i = indexOfSelectedItem else { // Create a new item
             toDoList.append(toDoListItem(description: description, dueDate: dueDate, isChecked: false, hasADue: hasADue))
             tableView.reloadData()
             return
         }
+        // make some changes
         toDoList[i].description = description
         toDoList[i].hasADue = hasADue
         if hasADue {
@@ -108,6 +109,7 @@ class TableViewController: UITableViewController, toDoListProtocol {
     }
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        // Check or uncheck when hit
         let i = indexPath.row
         toDoList[i].isChecked = !(toDoList[i].isChecked)
         tableView.reloadData()
@@ -136,6 +138,7 @@ class TableViewController: UITableViewController, toDoListProtocol {
 
     // Override to support rearranging the table view.
     override func tableView(_ tableView: UITableView, moveRowAt fromIndexPath: IndexPath, to: IndexPath) {
+        // Change order: romove it from the previous position and then insert it to the target position
         let from = fromIndexPath.row
         let dest = to.row
         let temp = toDoList[from]

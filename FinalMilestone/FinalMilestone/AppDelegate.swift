@@ -2,7 +2,7 @@
 //  AppDelegate.swift
 //  FinalMilestone
 //
-//  Created by 刘钊睿 on 2018/3/25.
+//  Created by 刘钊睿(Zhaorui Liu s5121594) on 2018/3/25.
 //  Copyright © 2018年 Griffith University. All rights reserved.
 //
 
