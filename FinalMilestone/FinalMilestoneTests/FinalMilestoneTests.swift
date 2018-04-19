@@ -2,7 +2,7 @@
 //  FinalMilestoneTests.swift
 //  FinalMilestoneTests
 //
-//  Created by 刘钊睿 on 2018/3/25.
+//  Created by 刘钊睿(Zhaorui Liu s5121594) on 2018/3/25.
 //  Copyright © 2018年 Griffith University. All rights reserved.
 //
 
@@ -24,6 +24,20 @@ class FinalMilestoneTests: XCTestCase {
     func testExample() {
         // This is an example of a functional test case.
         // Use XCTAssert and related functions to verify your tests produce the correct results.
+        let example1 = toDoListItem(description: "Wash the dishes", isChecked: true)
+        XCTAssertEqual(example1.description, "Wash the dishes")
+        XCTAssertEqual(example1.hasADue, false)
+        XCTAssertEqual(example1.isChecked, true)
+        
+        let temp = "2018-9-30"
+        let dateformatter = DateFormatter()
+        dateformatter.dateFormat = "YYYY-MM-dd"
+        let newDate = dateformatter.date(from: temp)
+        let example2 = toDoListItem(description: "Wash the car", dueDate: newDate, isChecked: false, hasADue: true)
+        XCTAssertEqual(example2.description, "Wash the car")
+        XCTAssertEqual(example2.dueDate, newDate)
+        XCTAssertEqual(example2.isChecked, false)
+        XCTAssertEqual(example2.hasADue, true)
     }
     
     func testPerformanceExample() {

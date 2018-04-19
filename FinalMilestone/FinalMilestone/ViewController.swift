@@ -9,15 +9,26 @@
 import UIKit
 
 class ViewController: UIViewController, UITextFieldDelegate {
-
+    
+    /// To input description
     @IBOutlet weak var myTextField: UITextField!
+    
+    /// To enable or disable the datePicker
     @IBOutlet weak var mySwitch: UISwitch!
+    
+    /// To chose a due date
     @IBOutlet weak var myDatePicker: UIDatePicker!
     
+    /// The index of selected item in the array (nil for none)
     var indexOfSelectedItem: Int?
+    
+    /// The selected item object (nil for none)
     var selectedItem: toDoListItem?
     
+    /// Record if cancle button is tapped
     private var isCanceled: Bool = false
+    
+    /// Use protocol to pass parameters from TableViewController to ViewController
     var delegator: toDoListProtocol?
     
     override func viewDidLoad() {
@@ -62,10 +73,20 @@ class ViewController: UIViewController, UITextFieldDelegate {
         return true;
     }
 
+    /**
+     Enable or diable datePicker when switch tapped
+     
+     - Parameter sender: The component which sends this action
+     */
     @IBAction func enableOrDisableDue(_ sender: UISwitch) {
         myDatePicker.isEnabled = mySwitch.isOn ? true : false
     }
     
+    /**
+     Respond when cancle button tapped
+     
+     - Parameter sender: The component which sends this action
+     */
     @IBAction func cancelEditing(_ sender: UIBarButtonItem) {
         // If cancle button hit, go to previous page
         isCanceled = true

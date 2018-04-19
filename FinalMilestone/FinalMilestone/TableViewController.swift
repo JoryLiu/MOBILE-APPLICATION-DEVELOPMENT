@@ -10,6 +10,7 @@ import UIKit
 
 class TableViewController: UITableViewController, toDoListProtocol {
     
+    /// An array for storing toDoListItem
     var toDoList = [toDoListItem]()
     
     var indexOfSelectedItem: Int?
@@ -26,6 +27,10 @@ class TableViewController: UITableViewController, toDoListProtocol {
         initialization()
     }
     
+    /**
+     This function performs the initialisation.
+     
+     */
     func initialization() { // initialize with some examples
         toDoList.append(toDoListItem(description: "Buy Bread"))
         toDoList.append(toDoListItem(description: "Buy Milk", isChecked: true))
@@ -102,10 +107,6 @@ class TableViewController: UITableViewController, toDoListProtocol {
             toDoList[i].dueDate = dueDate
         }
         tableView.reloadData()
-    }
-    
-    func cancle(_ dvc: ViewController) {
-        
     }
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
