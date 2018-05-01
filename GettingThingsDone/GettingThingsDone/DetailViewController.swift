@@ -38,8 +38,10 @@ class DetailViewController: UITableViewController, UITextFieldDelegate {
         guard text != "" else {
             return
         }
-
-        delegator?.save(sectionOfSelectedItem: sectionOfSelectedItem, indexOfSelectedItem: indexOfSelectedItem, selectedItem: selectedItem, task: text!, history: [String](), collaborators: [String]())
+        
+        if let t = text {
+            delegator?.save(sectionOfSelectedItem: sectionOfSelectedItem, indexOfSelectedItem: indexOfSelectedItem, selectedItem: selectedItem, task: t, history: [String](), collaborators: [String]())
+        }
     }
 
     override func didReceiveMemoryWarning() {
