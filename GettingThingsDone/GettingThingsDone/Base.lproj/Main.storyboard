@@ -72,15 +72,13 @@
                                         </textField>
                                     </subviews>
                                     <constraints>
-                                        <constraint firstItem="2Da-zd-kSw" firstAttribute="trailing" secondItem="5Ly-xq-heB" secondAttribute="trailingMargin" id="9Cn-bs-LBz"/>
-                                        <constraint firstItem="2Da-zd-kSw" firstAttribute="centerY" secondItem="5Ly-xq-heB" secondAttribute="centerY" id="KuB-9J-r8m"/>
-                                        <constraint firstItem="2Da-zd-kSw" firstAttribute="leading" secondItem="5Ly-xq-heB" secondAttribute="leadingMargin" id="Vqq-sk-Eay"/>
+                                        <constraint firstItem="2Da-zd-kSw" firstAttribute="trailing" secondItem="5Ly-xq-heB" secondAttribute="trailingMargin" id="00O-Wv-aLl"/>
+                                        <constraint firstItem="2Da-zd-kSw" firstAttribute="centerY" secondItem="5Ly-xq-heB" secondAttribute="centerY" id="1RV-mj-H2S"/>
+                                        <constraint firstItem="2Da-zd-kSw" firstAttribute="leading" secondItem="5Ly-xq-heB" secondAttribute="leadingMargin" id="g8P-rZ-1gl"/>
                                     </constraints>
                                 </tableViewCellContentView>
                                 <connections>
-                                    <outlet property="MyCell" destination="5Ly-xq-heB" id="Vrx-sE-4pb"/>
-                                    <outlet property="MyTextField" destination="2Da-zd-kSw" id="Da6-br-42Q"/>
-                                    <outlet property="myTextField" destination="2Da-zd-kSw" id="Xug-hM-jzx"/>
+                                    <outlet property="myTextField" destination="2Da-zd-kSw" id="a0o-oI-3x9"/>
                                 </connections>
                             </tableViewCell>
                         </prototypes>
