@@ -54,10 +54,10 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" cocoaTouchSystemColor="groupTableViewBackgroundColor"/>
                         <prototypes>
-                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="Cell" id="eym-Ty-VSD">
+                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="Cell" id="eym-Ty-VSD" customClass="MyCell" customModule="GettingThingsDone" customModuleProvider="target">
                                 <rect key="frame" x="0.0" y="55.5" width="375" height="44"/>
                                 <autoresizingMask key="autoresizingMask"/>
-                                <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="eym-Ty-VSD" id="5Ly-xq-heB">
+                                <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="eym-Ty-VSD" id="5Ly-xq-heB" customClass="MyCell" customModule="GettingThingsDone" customModuleProvider="target">
                                     <rect key="frame" x="0.0" y="0.0" width="375" height="43.5"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                     <subviews>
@@ -66,14 +66,22 @@
                                             <nil key="textColor"/>
                                             <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                             <textInputTraits key="textInputTraits"/>
+                                            <connections>
+                                                <outlet property="delegate" destination="nZt-sS-Vfj" id="kCX-kg-nG1"/>
+                                            </connections>
                                         </textField>
                                     </subviews>
                                     <constraints>
-                                        <constraint firstItem="2Da-zd-kSw" firstAttribute="centerY" secondItem="5Ly-xq-heB" secondAttribute="centerY" id="5rW-e9-b5C"/>
-                                        <constraint firstItem="2Da-zd-kSw" firstAttribute="leading" secondItem="5Ly-xq-heB" secondAttribute="leadingMargin" id="qdD-uf-2tS"/>
-                                        <constraint firstItem="2Da-zd-kSw" firstAttribute="trailing" secondItem="5Ly-xq-heB" secondAttribute="trailingMargin" id="zxZ-Ic-iPo"/>
+                                        <constraint firstItem="2Da-zd-kSw" firstAttribute="trailing" secondItem="5Ly-xq-heB" secondAttribute="trailingMargin" id="9Cn-bs-LBz"/>
+                                        <constraint firstItem="2Da-zd-kSw" firstAttribute="centerY" secondItem="5Ly-xq-heB" secondAttribute="centerY" id="KuB-9J-r8m"/>
+                                        <constraint firstItem="2Da-zd-kSw" firstAttribute="leading" secondItem="5Ly-xq-heB" secondAttribute="leadingMargin" id="Vqq-sk-Eay"/>
                                     </constraints>
                                 </tableViewCellContentView>
+                                <connections>
+                                    <outlet property="MyCell" destination="5Ly-xq-heB" id="Vrx-sE-4pb"/>
+                                    <outlet property="MyTextField" destination="2Da-zd-kSw" id="Da6-br-42Q"/>
+                                    <outlet property="myTextField" destination="2Da-zd-kSw" id="Xug-hM-jzx"/>
+                                </connections>
                             </tableViewCell>
                         </prototypes>
                         <sections/>

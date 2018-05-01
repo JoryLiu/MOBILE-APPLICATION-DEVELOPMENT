@@ -8,10 +8,22 @@
 
 import UIKit
 
+class MyCell: UITableViewCell {
+    @IBOutlet weak var myTextField: UITextField!
+}
+
 class DetailViewController: UITableViewController, UITextFieldDelegate {
     
     let headers = ["TASK", "HISTORY", "COLLABORATORS"]
-
+    
+    var sectionOfSelectedItem: Int?
+    var indexOfSelectedItem: Int?
+    var selectedItem: ToDoItem?
+    
+    var delegator: toDoListProtocol?
+    
+    var text: String?
+    
     override func viewDidLoad() {
         super.viewDidLoad()
 
@@ -20,6 +32,14 @@ class DetailViewController: UITableViewController, UITextFieldDelegate {
 
         // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
         // self.navigationItem.rightBarButtonItem = self.editButtonItem
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        guard text != "" else {
+            return
+        }
+
+        delegator?.save(sectionOfSelectedItem: sectionOfSelectedItem, indexOfSelectedItem: indexOfSelectedItem, selectedItem: selectedItem, task: text!, history: [String](), collaborators: [String]())
     }
 
     override func didReceiveMemoryWarning() {
@@ -44,10 +64,11 @@ class DetailViewController: UITableViewController, UITextFieldDelegate {
     }
 
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "Cell", for: indexPath)
+         let cell = tableView.dequeueReusableCell(withIdentifier: "Cell", for: indexPath) as! MyCell
 
-        // Configure the cell...
-
+        // Configure the cell..
+        cell.myTextField.text = selectedItem?.task
+        
         return cell
     }
     
@@ -57,6 +78,7 @@ class DetailViewController: UITableViewController, UITextFieldDelegate {
     
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         textField.resignFirstResponder()
+        text = textField.text
         return true
     }
 

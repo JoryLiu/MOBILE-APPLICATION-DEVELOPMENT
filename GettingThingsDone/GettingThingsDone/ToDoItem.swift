@@ -13,7 +13,8 @@ class ToDoItem {
     var history: [String]
     var collaborators: [String]
     
-    init(task: String, history: [String], collaborators: [String]) {
+    init(task: String, history: [String] = [String](),
+         collaborators: [String] = [String]()) {
         self.task = task
         self.history = history
         self.collaborators = collaborators
