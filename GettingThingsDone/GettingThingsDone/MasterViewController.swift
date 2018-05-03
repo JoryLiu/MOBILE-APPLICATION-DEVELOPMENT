@@ -93,6 +93,7 @@ class MasterViewController: UITableViewController, toDoListProtocol {
         }
         
         myTasks[0][indexOfSelectedItem!].task = task
+        tableView.reloadData()
     }
 
     /*
