@@ -2,8 +2,8 @@
 //  ToDoItem.swift
 //  GettingThingsDone
 //
-//  Created by 刘钊睿 on 2018/4/24.
-//  Copyright © 2018年 Griffith University. All rights reserved.
+//  Created by Zhaorui Liu on 4/5/18.
+//  Copyright © 2018 Zhaorui Liu. All rights reserved.
 //
 
 import Foundation

@@ -2,8 +2,8 @@
 //  GettingThingsDoneTests.swift
 //  GettingThingsDoneTests
 //
-//  Created by Zhaorui Liu on 24/4/18.
-//  Copyright © 2018 Griffith University. All rights reserved.
+//  Created by Zhaorui Liu on 4/5/18.
+//  Copyright © 2018 Zhaorui Liu. All rights reserved.
 //
 
 import XCTest
