@@ -122,7 +122,7 @@
                                     <autoresizingMask key="autoresizingMask"/>
                                     <subviews>
                                         <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="W1f-sT-MXz">
-                                            <rect key="frame" x="20" y="6" width="627" height="30"/>
+                                            <rect key="frame" x="622" y="7" width="25" height="30"/>
                                             <nil key="textColor"/>
                                             <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                             <textInputTraits key="textInputTraits"/>
@@ -132,9 +132,8 @@
                                         </textField>
                                     </subviews>
                                     <constraints>
-                                        <constraint firstItem="W1f-sT-MXz" firstAttribute="leading" secondItem="MpM-YH-N7v" secondAttribute="leadingMargin" id="Qs6-Eh-ggV"/>
-                                        <constraint firstItem="W1f-sT-MXz" firstAttribute="centerY" secondItem="MpM-YH-N7v" secondAttribute="centerY" id="QxD-Y9-o2R"/>
-                                        <constraint firstItem="W1f-sT-MXz" firstAttribute="trailing" secondItem="MpM-YH-N7v" secondAttribute="trailingMargin" id="dp6-ou-hLT"/>
+                                        <constraint firstItem="W1f-sT-MXz" firstAttribute="centerY" secondItem="MpM-YH-N7v" secondAttribute="centerY" id="6IU-ZB-3BD"/>
+                                        <constraint firstItem="W1f-sT-MXz" firstAttribute="trailing" secondItem="MpM-YH-N7v" secondAttribute="trailingMargin" id="yc0-kV-n0w"/>
                                     </constraints>
                                 </tableViewCellContentView>
                                 <connections>
@@ -142,6 +141,7 @@
                                 </connections>
                             </tableViewCell>
                         </prototypes>
+                        <sections/>
                         <connections>
                             <outlet property="dataSource" destination="Iix-Lm-WPb" id="UDv-r8-kKw"/>
                             <outlet property="delegate" destination="Iix-Lm-WPb" id="ssW-df-Qbg"/>
@@ -153,7 +153,7 @@
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="UQ1-SO-AV9" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="708" y="127.28635682158921"/>
+            <point key="canvasLocation" x="707.49625187406298" y="127.2"/>
         </scene>
     </scenes>
     <inferredMetricsTieBreakers>

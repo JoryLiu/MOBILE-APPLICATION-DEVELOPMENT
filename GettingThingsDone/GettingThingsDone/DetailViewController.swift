@@ -60,6 +60,11 @@ class DetailViewController: UITableViewController, UITextFieldDelegate {
         // #warning Incomplete implementation, return the number of rows
         if section == 0 {
             return 1
+        } else if section == 1 {
+            guard let item = selectedItem else {
+                return 0
+            }
+            return item.history.count
         } else {
             return 0
         }
@@ -69,7 +74,31 @@ class DetailViewController: UITableViewController, UITextFieldDelegate {
         let cell = tableView.dequeueReusableCell(withIdentifier: "Cell", for: indexPath) as! MyCell
         
         // Configure the cell..
-        cell.myTextField.text = selectedItem?.task
+        var offSet: CGFloat = 0
+        if indexPath.section == 0 {
+            cell.myTextField.text = selectedItem?.task
+        } else if indexPath.section == 1 {
+            let dateFormatter = DateFormatter()
+            dateFormatter.dateFormat = "M/dd/yy, HH:mm a"
+            cell.textLabel?.text = dateFormatter.string(from: selectedItem?.history[indexPath.row].time as! Date)
+            
+            cell.myTextField.layer.position = CGPoint(x: 500, y: 0)
+            offSet = 150
+            
+            cell.myTextField.text = selectedItem?.history[indexPath.row].description
+            cell.myTextField.isEnabled = (selectedItem?.history[indexPath.row].editable)!
+        }
+        
+        let leadingConstraint = NSLayoutConstraint(
+            item: cell.myTextField,
+            attribute: NSLayoutAttribute.leading,
+            relatedBy: .equal,
+            toItem: cell.contentView,
+            attribute: .leadingMargin,
+            multiplier: 1.0,
+            constant: offSet
+        )
+        cell.contentView.addConstraint(leadingConstraint)
         
         return cell
     }

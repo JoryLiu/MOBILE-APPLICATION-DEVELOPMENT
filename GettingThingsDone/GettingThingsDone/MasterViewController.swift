@@ -35,8 +35,11 @@ class MasterViewController: UITableViewController, toDoListProtocol {
     }
     
     func initialization() {
-        myTasks[0].append(ToDoItem(task: "Todo Item 1"))
-        myTasks[0].append(ToDoItem(task: "Todo Item 2"))
+        let addRecord = Record(description: "added")
+        var records = [Record]()
+        records.append(addRecord)
+        myTasks[0].append(ToDoItem(task: "Todo Item 1", history: records))
+        myTasks[0].append(ToDoItem(task: "Todo Item 2", history: records))
     }
     
     override func viewWillAppear(_ animated: Bool) {
