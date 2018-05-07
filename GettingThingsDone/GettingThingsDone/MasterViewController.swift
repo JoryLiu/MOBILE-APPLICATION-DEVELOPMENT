@@ -77,23 +77,24 @@ class MasterViewController: UITableViewController, toDoListProtocol {
     }
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        let dvc = (segue.destination as! UINavigationController).topViewController as! DetailViewController
-        dvc.delegator = self
-        dvc.navigationItem.leftBarButtonItem = splitViewController?.displayModeButtonItem
+    
+        let navi = segue.destination as! UINavigationController
+        let dvc = navi.topViewController as! DetailViewController
         dvc.navigationItem.leftItemsSupplementBackButton = true
+        dvc.navigationItem.leftBarButtonItem = splitViewController?.displayModeButtonItem
+        dvc.delegator = self
         
-        if sender is UIBarButtonItem {
-            return
-        }
-        
-        let cell = sender as! UITableViewCell
-        let indexPath: IndexPath = tableView.indexPath(for: cell)!
-        indexOfSelectedItem = indexPath.row
-        sectionOfSelectedItem = indexPath.section
-        if let i = sectionOfSelectedItem {
-            dvc.sectionOfSelectedItem = i
-            dvc.indexOfSelectedItem = indexOfSelectedItem
-            dvc.selectedItem = myTasks[i][indexOfSelectedItem!]
+        if segue.identifier == "showDetail" {
+            
+            let cell = sender as! UITableViewCell
+            let indexPath: IndexPath = tableView.indexPath(for: cell)!
+            indexOfSelectedItem = indexPath.row
+            sectionOfSelectedItem = indexPath.section
+            if let i = sectionOfSelectedItem {
+                dvc.sectionOfSelectedItem = i
+                dvc.indexOfSelectedItem = indexOfSelectedItem
+                dvc.selectedItem = myTasks[i][indexOfSelectedItem!]
+            }
         }
         
     }
