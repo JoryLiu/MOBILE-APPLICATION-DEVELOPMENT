@@ -42,9 +42,16 @@ class DetailViewController: UITableViewController, UITextFieldDelegate {
         }
         
         historyRecords = item.history
+        
+        let nc = NotificationCenter.default
+        let notificationName = Notification.Name(rawValue: "SelectedItem Completed")
+        nc.addObserver(forName: notificationName, object: nil, queue: nil) { _ in
+            self.historyRecords.insert(Record(description: "completed"), at: 0)
+            self.tableView.reloadData()
+        }
     }
     
-    override func viewWillDisappear(_ animated: Bool) {
+    func saveChanges() {
         guard text != "" else {
             return
         }
@@ -52,6 +59,11 @@ class DetailViewController: UITableViewController, UITextFieldDelegate {
         if let t = text {
             delegator?.save(sectionOfSelectedItem: sectionOfSelectedItem, indexOfSelectedItem: indexOfSelectedItem, selectedItem: selectedItem, task: t, history: historyRecords, collaborators: [String]())
         }
+        tableView.reloadData()
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        saveChanges()
     }
     
     override func didReceiveMemoryWarning() {
@@ -122,9 +134,14 @@ class DetailViewController: UITableViewController, UITextFieldDelegate {
         
         if indexPath?.section == 0 {
             text = textField.text
+            if let t = text, t != selectedItem?.task && t != "" {
+                let renameRecord:Record = Record(description: "changed to \(t)")
+                historyRecords.insert(renameRecord, at: 0)
+            }
         } else if indexPath?.section == 1 {
             historyRecords[0].description = textField.text!
         }
+        saveChanges()
         return true
     }
     
@@ -132,6 +149,7 @@ class DetailViewController: UITableViewController, UITextFieldDelegate {
         historyRecords.insert(Record(editable: true), at: 0)
         tableView.reloadData()
     }
+    
     /*
      // Override to support conditional editing of the table view.
      override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {

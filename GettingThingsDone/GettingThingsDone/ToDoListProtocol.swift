@@ -11,7 +11,6 @@ import Foundation
 protocol toDoListProtocol {
     var sectionOfSelectedItem: Int? { get }
     var indexOfSelectedItem: Int? { get }
-    var selectedItem: ToDoItem? { get }
     
     func save(sectionOfSelectedItem: Int?, indexOfSelectedItem: Int?, selectedItem: ToDoItem?,
               task: String, history: [Record], collaborators: [String])

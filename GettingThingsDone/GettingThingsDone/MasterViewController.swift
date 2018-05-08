@@ -18,7 +18,6 @@ class MasterViewController: UITableViewController, toDoListProtocol {
     
     var sectionOfSelectedItem: Int?
     var indexOfSelectedItem: Int?
-    var selectedItem: ToDoItem?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -80,48 +79,6 @@ class MasterViewController: UITableViewController, toDoListProtocol {
         return headers[section]
     }
     
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-    
-        let navi = segue.destination as! UINavigationController
-        let dvc = navi.topViewController as! DetailViewController
-        dvc.navigationItem.leftItemsSupplementBackButton = true
-        dvc.navigationItem.leftBarButtonItem = splitViewController?.displayModeButtonItem
-        dvc.delegator = self
-        
-        if segue.identifier == "showDetail" {
-            
-            let cell = sender as! UITableViewCell
-            let indexPath: IndexPath = tableView.indexPath(for: cell)!
-            indexOfSelectedItem = indexPath.row
-            sectionOfSelectedItem = indexPath.section
-            if let i = sectionOfSelectedItem {
-                dvc.sectionOfSelectedItem = i
-                dvc.indexOfSelectedItem = indexOfSelectedItem
-                dvc.selectedItem = myTasks[i][indexOfSelectedItem!]
-            }
-        }
-        
-    }
-    
-    func save(sectionOfSelectedItem: Int?, indexOfSelectedItem: Int?, selectedItem: ToDoItem?,
-              task: String, history: [Record], collaborators: [String]) {
-        var fliteredHistory = history.filter {$0.description != ""}
-        guard let s = sectionOfSelectedItem else {
-            //let addRecord: Record = Record(description: "added")
-            myTasks[0].insert(ToDoItem(task: task, history: fliteredHistory), at: 0)
-            tableView.reloadData()
-            return
-        }
-        
-        if myTasks[s][indexOfSelectedItem!].task != task {
-            let renameRecord:Record = Record(description: "rename form \(myTasks[s][indexOfSelectedItem!].task) to \(task)")
-            fliteredHistory.insert(renameRecord, at: 0)
-            myTasks[s][indexOfSelectedItem!].task = task
-        }
-        myTasks[s][indexOfSelectedItem!].history = fliteredHistory
-        tableView.reloadData()
-    }
-    
     /*
      // Override to support conditional editing of the table view.
      override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
@@ -154,10 +111,63 @@ class MasterViewController: UITableViewController, toDoListProtocol {
         if fromSection == 0 && toSection == 1 {
             let completeRecod: Record = Record(description: "completed")
             temp.history.insert(completeRecod, at: 0)
+            
+            if let row = indexOfSelectedItem, let section = sectionOfSelectedItem {
+                if row == fromRow && section == fromSection {
+                    let notificationName = Notification.Name(rawValue: "SelectedItem Completed")
+                    NotificationCenter.default.post(name: notificationName, object: self)
+                }
+            }
         }
         
         myTasks[fromSection].remove(at: fromRow)
         myTasks[toSection].insert(temp, at: toRow)
+        tableView.reloadData()
+    }
+    
+    // MARK: - Navigation
+    
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        
+        let navi = segue.destination as! UINavigationController
+        let dvc = navi.topViewController as! DetailViewController
+        dvc.navigationItem.leftItemsSupplementBackButton = true
+        dvc.navigationItem.leftBarButtonItem = splitViewController?.displayModeButtonItem
+        dvc.delegator = self
+        
+        if segue.identifier == "showDetail" {
+            
+            let cell = sender as! UITableViewCell
+            let indexPath: IndexPath = tableView.indexPath(for: cell)!
+            indexOfSelectedItem = indexPath.row
+            sectionOfSelectedItem = indexPath.section
+            if let i = sectionOfSelectedItem, let j = indexOfSelectedItem {
+                dvc.sectionOfSelectedItem = i
+                dvc.indexOfSelectedItem = indexOfSelectedItem
+                dvc.selectedItem = myTasks[i][j]
+            }
+        }
+        
+    }
+    
+    // MARK: - Protocl
+    
+    func save(sectionOfSelectedItem: Int?, indexOfSelectedItem: Int?, selectedItem: ToDoItem?,
+              task: String, history: [Record], collaborators: [String]) {
+        let fliteredHistory = history.filter {$0.description != ""}
+        guard sectionOfSelectedItem != nil else {
+            myTasks[0].insert(ToDoItem(task: task, history: fliteredHistory), at: 0)
+            tableView.reloadData()
+            return
+        }
+        
+        if selectedItem?.task != task {
+//            let renameRecord:Record = Record(description: "changed to \(task)")
+//            fliteredHistory.insert(renameRecord, at: 0)
+//            //            myTasks[s][indexOfSelectedItem!].task = task
+            selectedItem?.task = task
+       }
+        selectedItem?.history = fliteredHistory
         tableView.reloadData()
     }
     
@@ -170,7 +180,6 @@ class MasterViewController: UITableViewController, toDoListProtocol {
      */
     
     /*
-     // MARK: - Navigation
      
      // In a storyboard-based application, you will often want to do a little preparation before navigation
      override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
