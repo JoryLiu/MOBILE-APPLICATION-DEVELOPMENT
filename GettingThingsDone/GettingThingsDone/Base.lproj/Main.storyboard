@@ -148,7 +148,11 @@
                         </connections>
                     </tableView>
                     <navigationItem key="navigationItem" id="32s-9S-8N7">
-                        <barButtonItem key="rightBarButtonItem" systemItem="add" id="IwK-b4-v5V"/>
+                        <barButtonItem key="rightBarButtonItem" systemItem="add" id="IwK-b4-v5V">
+                            <connections>
+                                <action selector="addhistory:" destination="Iix-Lm-WPb" id="yXE-vn-jI9"/>
+                            </connections>
+                        </barButtonItem>
                     </navigationItem>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="UQ1-SO-AV9" userLabel="First Responder" sceneMemberID="firstResponder"/>

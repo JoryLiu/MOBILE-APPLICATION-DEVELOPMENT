@@ -14,5 +14,5 @@ protocol toDoListProtocol {
     var selectedItem: ToDoItem? { get }
     
     func save(sectionOfSelectedItem: Int?, indexOfSelectedItem: Int?, selectedItem: ToDoItem?,
-              task: String, history: [String], collaborators: [String])
+              task: String, history: [Record], collaborators: [String])
 }

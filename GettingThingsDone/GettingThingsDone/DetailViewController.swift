@@ -23,6 +23,7 @@ class DetailViewController: UITableViewController, UITextFieldDelegate {
     var delegator: toDoListProtocol?
     
     var text: String?
+    var historyRecords = [Record]()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -31,7 +32,16 @@ class DetailViewController: UITableViewController, UITextFieldDelegate {
         // self.clearsSelectionOnViewWillAppear = false
         
         // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
-        // self.navigationItem.rightBarButtonItem = self.editButtonItem
+        // self.navigationItem.rightBarButtonItem = self.editButtonItem\
+        if let t = selectedItem?.task {
+            text = t
+        }
+        guard let item = selectedItem else {
+            historyRecords.insert(Record(description: "added"), at: 0)
+            return
+        }
+        
+        historyRecords = item.history
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -40,7 +50,7 @@ class DetailViewController: UITableViewController, UITextFieldDelegate {
         }
         
         if let t = text {
-            delegator?.save(sectionOfSelectedItem: sectionOfSelectedItem, indexOfSelectedItem: indexOfSelectedItem, selectedItem: selectedItem, task: t, history: [String](), collaborators: [String]())
+            delegator?.save(sectionOfSelectedItem: sectionOfSelectedItem, indexOfSelectedItem: indexOfSelectedItem, selectedItem: selectedItem, task: t, history: historyRecords, collaborators: [String]())
         }
     }
     
@@ -61,10 +71,7 @@ class DetailViewController: UITableViewController, UITextFieldDelegate {
         if section == 0 {
             return 1
         } else if section == 1 {
-            guard let item = selectedItem else {
-                return 0
-            }
-            return item.history.count
+            return historyRecords.count
         } else {
             return 0
         }
@@ -80,13 +87,13 @@ class DetailViewController: UITableViewController, UITextFieldDelegate {
         } else if indexPath.section == 1 {
             let dateFormatter = DateFormatter()
             dateFormatter.dateFormat = "M/dd/yy, HH:mm a"
-            cell.textLabel?.text = dateFormatter.string(from: selectedItem?.history[indexPath.row].time as! Date)
+            cell.textLabel?.text = dateFormatter.string(from: historyRecords[indexPath.row].time as! Date)
             
             cell.myTextField.layer.position = CGPoint(x: 500, y: 0)
             offSet = 150
             
-            cell.myTextField.text = selectedItem?.history[indexPath.row].description
-            cell.myTextField.isEnabled = (selectedItem?.history[indexPath.row].editable)!
+            cell.myTextField.text = historyRecords[indexPath.row].description
+            cell.myTextField.isEnabled = historyRecords[indexPath.row].editable
         }
         
         let leadingConstraint = NSLayoutConstraint(
@@ -109,10 +116,22 @@ class DetailViewController: UITableViewController, UITextFieldDelegate {
     
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         textField.resignFirstResponder()
-        text = textField.text
+        let cell: UITableViewCell = textField.superview!.superview as! UITableViewCell
+        let table: UITableView = cell.superview as! UITableView
+        let indexPath = table.indexPath(for: cell)
+        
+        if indexPath?.section == 0 {
+            text = textField.text
+        } else if indexPath?.section == 1 {
+            historyRecords[0].description = textField.text!
+        }
         return true
     }
     
+    @IBAction func addhistory(_ sender: UIBarButtonItem) {
+        historyRecords.insert(Record(editable: true), at: 0)
+        tableView.reloadData()
+    }
     /*
      // Override to support conditional editing of the table view.
      override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {

@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import Foundation
 
 class MasterViewController: UITableViewController, toDoListProtocol {
     
@@ -103,14 +104,21 @@ class MasterViewController: UITableViewController, toDoListProtocol {
     }
     
     func save(sectionOfSelectedItem: Int?, indexOfSelectedItem: Int?, selectedItem: ToDoItem?,
-              task: String, history: [String], collaborators: [String]) {
-        guard sectionOfSelectedItem == 0 else {
-            myTasks[0].append(ToDoItem(task: task))
+              task: String, history: [Record], collaborators: [String]) {
+        var fliteredHistory = history.filter {$0.description != ""}
+        guard let s = sectionOfSelectedItem else {
+            //let addRecord: Record = Record(description: "added")
+            myTasks[0].insert(ToDoItem(task: task, history: fliteredHistory), at: 0)
             tableView.reloadData()
             return
         }
         
-        myTasks[0][indexOfSelectedItem!].task = task
+        if myTasks[s][indexOfSelectedItem!].task != task {
+            let renameRecord:Record = Record(description: "rename form \(myTasks[s][indexOfSelectedItem!].task) to \(task)")
+            fliteredHistory.insert(renameRecord, at: 0)
+            myTasks[s][indexOfSelectedItem!].task = task
+        }
+        myTasks[s][indexOfSelectedItem!].history = fliteredHistory
         tableView.reloadData()
     }
     
@@ -142,6 +150,11 @@ class MasterViewController: UITableViewController, toDoListProtocol {
         let toSection = to.section
         let toRow = to.row
         let temp = myTasks[fromSection][fromRow]
+        
+        if fromSection == 0 && toSection == 1 {
+            let completeRecod: Record = Record(description: "completed")
+            temp.history.insert(completeRecod, at: 0)
+        }
         
         myTasks[fromSection].remove(at: fromRow)
         myTasks[toSection].insert(temp, at: toRow)
