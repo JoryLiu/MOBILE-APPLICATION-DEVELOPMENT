@@ -33,22 +33,25 @@ class DetailViewController: UITableViewController, UITextFieldDelegate {
         
         // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
         // self.navigationItem.rightBarButtonItem = self.editButtonItem\
+        
         if let t = selectedItem?.task {
             text = t
         }
+        
+        let nc = NotificationCenter.default
+        let notificationName = Notification.Name(rawValue: "SelectedItem Completed")
+        nc.addObserver(forName: notificationName, object: nil, queue: nil) { _ in
+            self.historyRecords.insert(Record(description: "completed"), at: 0)
+            //self.tableView.reloadData()
+            self.tableView.reloadSections(IndexSet(integer: 1), with: .automatic)
+        }
+        
         guard let item = selectedItem else {
             historyRecords.insert(Record(description: "added"), at: 0)
             return
         }
         
         historyRecords = item.history
-        
-        let nc = NotificationCenter.default
-        let notificationName = Notification.Name(rawValue: "SelectedItem Completed")
-        nc.addObserver(forName: notificationName, object: nil, queue: nil) { _ in
-            self.historyRecords.insert(Record(description: "completed"), at: 0)
-            self.tableView.reloadData()
-        }
     }
     
     func saveChanges() {
@@ -59,12 +62,13 @@ class DetailViewController: UITableViewController, UITextFieldDelegate {
         if let t = text {
             delegator?.save(sectionOfSelectedItem: sectionOfSelectedItem, indexOfSelectedItem: indexOfSelectedItem, selectedItem: selectedItem, task: t, history: historyRecords, collaborators: [String]())
         }
-        tableView.reloadData()
+        //tableView.reloadData()
+        tableView.reloadSections(IndexSet(integer: 1), with: .automatic)
     }
     
-    override func viewWillDisappear(_ animated: Bool) {
-        saveChanges()
-    }
+//    override func viewWillDisappear(_ animated: Bool) {
+//        saveChanges()
+//    }
     
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
@@ -134,7 +138,7 @@ class DetailViewController: UITableViewController, UITextFieldDelegate {
         
         if indexPath?.section == 0 {
             text = textField.text
-            if let t = text, t != selectedItem?.task && t != "" {
+            if let t = text, let item = selectedItem, t != item.task && t != "" {
                 let renameRecord:Record = Record(description: "changed to \(t)")
                 historyRecords.insert(renameRecord, at: 0)
             }
@@ -147,7 +151,8 @@ class DetailViewController: UITableViewController, UITextFieldDelegate {
     
     @IBAction func addhistory(_ sender: UIBarButtonItem) {
         historyRecords.insert(Record(editable: true), at: 0)
-        tableView.reloadData()
+        tableView.reloadSections(IndexSet(integer: 1), with: .automatic)
+        //tableView.reloadData()
     }
     
     /*

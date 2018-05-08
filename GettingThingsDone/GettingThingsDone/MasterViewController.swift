@@ -158,6 +158,10 @@ class MasterViewController: UITableViewController, toDoListProtocol {
         guard sectionOfSelectedItem != nil else {
             myTasks[0].insert(ToDoItem(task: task, history: fliteredHistory), at: 0)
             tableView.reloadData()
+            
+            self.sectionOfSelectedItem = 0
+            self.indexOfSelectedItem = 0
+            
             return
         }
         
