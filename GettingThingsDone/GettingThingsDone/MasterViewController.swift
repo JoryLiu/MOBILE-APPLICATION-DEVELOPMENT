@@ -9,8 +9,7 @@
 import UIKit
 import Foundation
 
-class MasterViewController: UITableViewController, toDoListProtocol {
-    
+class MasterViewController: UITableViewController, toDoListProtocol, PeerToPeerManagerDelegate {
     var peerToPeer = PeerToPeerManager();
     
     var detailViewController: DetailViewController? = nil
@@ -34,6 +33,7 @@ class MasterViewController: UITableViewController, toDoListProtocol {
             detailViewController = (controllers[controllers.count-1] as! UINavigationController).topViewController as? DetailViewController
         }
         initialization()
+        peerToPeer.delegate = self
     }
     
     func initialization() {
@@ -181,11 +181,16 @@ class MasterViewController: UITableViewController, toDoListProtocol {
         peerToPeer.send(data: json)
     }
     
+    func manager(_ manager: PeerToPeerManager, didReceive data: Data) {
+        json = data
+        tableView.reloadData()
+    }
+    
     // MARK: - Data
     
     var json:Data {
         get { return try! JSONEncoder().encode(myTasks) }
-        set { myTasks = [try! JSONDecoder().decode([ToDoItem].self, from: newValue)]}
+        set { myTasks = [try! JSONDecoder().decode(Array<ToDoItem>.self, from: newValue)]}
     }
     
     /*

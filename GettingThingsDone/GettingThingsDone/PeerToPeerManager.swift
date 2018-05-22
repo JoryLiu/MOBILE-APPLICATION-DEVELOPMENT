@@ -9,8 +9,14 @@
 import Foundation
 import MultipeerConnectivity
 
+protocol PeerToPeerManagerDelegate: AnyObject {
+    func manager(_ manager: PeerToPeerManager, didReceive data: Data)
+}
+
 class PeerToPeerManager: NSObject {
     static let serviceType = "todo-list"
+    
+    var delegate: PeerToPeerManagerDelegate?
     
     private let peerId = MCPeerID(displayName: "Zhaorui Liu")
     private let serviceAdvertiser: MCNearbyServiceAdvertiser
@@ -24,10 +30,12 @@ class PeerToPeerManager: NSObject {
         serviceAdvertiser.delegate = self
         serviceAdvertiser.startAdvertisingPeer()
         serviceBrowser.delegate = self
+        serviceBrowser.startBrowsingForPeers()
     }
     
     deinit {
         serviceAdvertiser.stopAdvertisingPeer()
+        serviceBrowser.stopBrowsingForPeers()
     }
     
     lazy var session: MCSession = {
@@ -61,10 +69,11 @@ extension PeerToPeerManager: MCNearbyServiceAdvertiserDelegate {
 extension PeerToPeerManager: MCSessionDelegate {
     func session(_ session: MCSession, didReceive data: Data, fromPeer peerID: MCPeerID) {
         print("Received \(data.count) bytes")
+        delegate?.manager(self, didReceive: data)
     }
     
     func session(_ session: MCSession, peer peerID: MCPeerID, didChange state: MCSessionState) {
-        print("SessionDidChange \(state)")
+        print("SessionDidChange \(state.rawValue)")
     }
     
     func session(_ session: MCSession, didReceive stream: InputStream, withName streamName: String, fromPeer peerID: MCPeerID) {
