@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		B8E8379E20B3C98E003F4E25 /* PeerToPeerManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8E8379D20B3C98E003F4E25 /* PeerToPeerManager.swift */; };
 		C13A5FE4209C1E4A00723C17 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = C13A5FE3209C1E4A00723C17 /* AppDelegate.swift */; };
 		C13A5FE6209C1E4A00723C17 /* MasterViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C13A5FE5209C1E4A00723C17 /* MasterViewController.swift */; };
 		C13A5FE8209C1E4A00723C17 /* DetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C13A5FE7209C1E4A00723C17 /* DetailViewController.swift */; };
@@ -37,6 +38,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		B8E8379D20B3C98E003F4E25 /* PeerToPeerManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PeerToPeerManager.swift; sourceTree = "<group>"; };
 		C13A5FE0209C1E4A00723C17 /* GettingThingsDone.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = GettingThingsDone.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		C13A5FE3209C1E4A00723C17 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		C13A5FE5209C1E4A00723C17 /* MasterViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MasterViewController.swift; sourceTree = "<group>"; };
@@ -103,6 +105,7 @@
 		C13A5FE2209C1E4A00723C17 /* GettingThingsDone */ = {
 			isa = PBXGroup;
 			children = (
+				B8E8379D20B3C98E003F4E25 /* PeerToPeerManager.swift */,
 				C13A5FE3209C1E4A00723C17 /* AppDelegate.swift */,
 				C13A5FE5209C1E4A00723C17 /* MasterViewController.swift */,
 				C13A6013209C1F9800723C17 /* ToDoListProtocol.swift */,
@@ -268,6 +271,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B8E8379E20B3C98E003F4E25 /* PeerToPeerManager.swift in Sources */,
 				C13A5FE8209C1E4A00723C17 /* DetailViewController.swift in Sources */,
 				C13A6014209C1F9800723C17 /* ToDoListProtocol.swift in Sources */,
 				C13A6016209C205000723C17 /* ToDoItem.swift in Sources */,

@@ -11,6 +11,8 @@ import Foundation
 
 class MasterViewController: UITableViewController, toDoListProtocol {
     
+    var peerToPeer = PeerToPeerManager();
+    
     var detailViewController: DetailViewController? = nil
     
     let headers = ["YET TO DO", "COMPLETED"]
@@ -95,6 +97,7 @@ class MasterViewController: UITableViewController, toDoListProtocol {
             let j = indexPath.section
             myTasks[j].remove(at: i)
             tableView.reloadData()
+            peerToPeer.send(data: json)
         } else if editingStyle == .insert {
             // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view
         }
@@ -123,6 +126,7 @@ class MasterViewController: UITableViewController, toDoListProtocol {
         myTasks[fromSection].remove(at: fromRow)
         myTasks[toSection].insert(temp, at: toRow)
         tableView.reloadData()
+        peerToPeer.send(data: json)
     }
     
     // MARK: - Navigation
@@ -158,6 +162,7 @@ class MasterViewController: UITableViewController, toDoListProtocol {
         guard sectionOfSelectedItem != nil else {
             myTasks[0].insert(ToDoItem(task: task, history: fliteredHistory), at: 0)
             tableView.reloadData()
+            peerToPeer.send(data: json)
             
             self.sectionOfSelectedItem = 0
             self.indexOfSelectedItem = 0
@@ -173,6 +178,14 @@ class MasterViewController: UITableViewController, toDoListProtocol {
        }
         selectedItem?.history = fliteredHistory
         tableView.reloadData()
+        peerToPeer.send(data: json)
+    }
+    
+    // MARK: - Data
+    
+    var json:Data {
+        get { return try! JSONEncoder().encode(myTasks) }
+        set { myTasks = [try! JSONDecoder().decode([ToDoItem].self, from: newValue)]}
     }
     
     /*

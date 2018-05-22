@@ -8,19 +8,19 @@
 
 import Foundation
 
-class Record {
-    var time: NSDate
+class Record:Codable {
+    var time: Date
     var description: String
     var editable: Bool
     
-    init(time: NSDate = NSDate(), description: String = "", editable: Bool = false) {
+    init(time: Date = Date(), description: String = "", editable: Bool = false) {
         self.time = time
         self.description = description
         self.editable = editable
     }
 }
 
-class ToDoItem {
+class ToDoItem: Codable {
     var task: String
     var history: [Record]
     var collaborators: [String]

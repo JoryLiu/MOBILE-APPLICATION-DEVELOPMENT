@@ -14,7 +14,7 @@ class MyCell: UITableViewCell {
 
 class DetailViewController: UITableViewController, UITextFieldDelegate {
     
-    let headers = ["TASK", "HISTORY", "COLLABORATORS"]
+    let headers = ["TASK", "HISTORY", "COLLABORATORS", "PEERS"]
     
     var sectionOfSelectedItem: Int?
     var indexOfSelectedItem: Int?
