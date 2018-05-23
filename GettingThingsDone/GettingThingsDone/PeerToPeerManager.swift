@@ -18,7 +18,7 @@ class PeerToPeerManager: NSObject {
     
     var delegate: PeerToPeerManagerDelegate?
     
-    private let peerId = MCPeerID(displayName: "Zhaorui Liu")
+    private let peerId = MCPeerID(displayName: "Zhaorui")
     private let serviceAdvertiser: MCNearbyServiceAdvertiser
     private let serviceBrowser: MCNearbyServiceBrowser
     
@@ -73,7 +73,14 @@ extension PeerToPeerManager: MCSessionDelegate {
     }
     
     func session(_ session: MCSession, peer peerID: MCPeerID, didChange state: MCSessionState) {
-        print("SessionDidChange \(state.rawValue)")
+        switch state.rawValue {
+        case 0:
+            print("SessionDidChange 'notConnected'")
+        case 1:
+            print("SessionDidChange 'connecting'")
+        default:
+            print("SessionDidChange 'connected'")
+        }
     }
     
     func session(_ session: MCSession, didReceive stream: InputStream, withName streamName: String, fromPeer peerID: MCPeerID) {
@@ -91,8 +98,20 @@ extension PeerToPeerManager: MCSessionDelegate {
 
 extension PeerToPeerManager: MCNearbyServiceBrowserDelegate {
     func browser(_ browser: MCNearbyServiceBrowser, foundPeer peerID: MCPeerID, withDiscoveryInfo info: [String : String]?) {
+        if peerID.displayName == self.peerId.displayName {
+            return
+        }
         print("Found \(peerID.displayName)")
-        invite(peer: peerID)
+        let notificationName = Notification.Name(rawValue: "Found Peer")
+        NotificationCenter.default.post(name: notificationName, object: self, userInfo: ["peerID": peerID])
+        
+        NotificationCenter.default.addObserver(forName: Notification.Name(rawValue: "Invite Peer"), object: nil, queue: nil) { (notification) in
+            guard let userInfo = notification.userInfo,
+                let collaborator = userInfo["peerID"] as? MCPeerID else {
+                    return
+            }
+            self.invite(peer: collaborator)
+        }
     }
     
     func browser(_ browser: MCNearbyServiceBrowser, lostPeer peerID: MCPeerID) {

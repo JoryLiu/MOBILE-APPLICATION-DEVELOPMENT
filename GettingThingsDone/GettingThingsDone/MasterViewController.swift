@@ -10,7 +10,7 @@ import UIKit
 import Foundation
 
 class MasterViewController: UITableViewController, toDoListProtocol, PeerToPeerManagerDelegate {
-    var peerToPeer = PeerToPeerManager();
+    var peerToPeer = PeerToPeerManager()
     
     var detailViewController: DetailViewController? = nil
     
@@ -32,7 +32,7 @@ class MasterViewController: UITableViewController, toDoListProtocol, PeerToPeerM
             let controllers = split.viewControllers
             detailViewController = (controllers[controllers.count-1] as! UINavigationController).topViewController as? DetailViewController
         }
-        initialization()
+        // initialization()
         peerToPeer.delegate = self
     }
     
@@ -97,7 +97,6 @@ class MasterViewController: UITableViewController, toDoListProtocol, PeerToPeerM
             let j = indexPath.section
             myTasks[j].remove(at: i)
             tableView.reloadData()
-            peerToPeer.send(data: json)
         } else if editingStyle == .insert {
             // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view
         }
@@ -126,10 +125,9 @@ class MasterViewController: UITableViewController, toDoListProtocol, PeerToPeerM
         myTasks[fromSection].remove(at: fromRow)
         myTasks[toSection].insert(temp, at: toRow)
         tableView.reloadData()
-        peerToPeer.send(data: json)
     }
     
-    // MARK: - Navigation
+    // MARK: - Segues
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         
@@ -162,7 +160,7 @@ class MasterViewController: UITableViewController, toDoListProtocol, PeerToPeerM
         guard sectionOfSelectedItem != nil else {
             myTasks[0].insert(ToDoItem(task: task, history: fliteredHistory), at: 0)
             tableView.reloadData()
-            peerToPeer.send(data: json)
+            peerToPeer.send(data: json(task: myTasks[0][0]))
             
             self.sectionOfSelectedItem = 0
             self.indexOfSelectedItem = 0
@@ -178,19 +176,31 @@ class MasterViewController: UITableViewController, toDoListProtocol, PeerToPeerM
        }
         selectedItem?.history = fliteredHistory
         tableView.reloadData()
-        peerToPeer.send(data: json)
+        peerToPeer.send(data: json(task: selectedItem!))
     }
     
     func manager(_ manager: PeerToPeerManager, didReceive data: Data) {
-        json = data
+        let temp = json(data)
+        for i in 0 ... 1 {
+            for j in 0 ... myTasks[i].count {
+                if (temp.id == myTasks[i][j].id) {
+                    myTasks[i][j] = temp
+                }
+            }
+        }
         tableView.reloadData()
     }
     
     // MARK: - Data
     
-    var json:Data {
-        get { return try! JSONEncoder().encode(myTasks) }
-        set { myTasks = [try! JSONDecoder().decode(Array<ToDoItem>.self, from: newValue)]}
+    func json(task: ToDoItem) -> Data {
+//        get { return try! JSONEncoder().encode(myTasks) }
+//        set { myTasks = [try! JSONDecoder().decode(Array<ToDoItem>.self, from: newValue)]}
+        return try! JSONEncoder().encode(task)
+    }
+    
+    func json(_ data: Data)-> ToDoItem {
+        return try! JSONDecoder().decode(ToDoItem.self, from: data)
     }
     
     /*
@@ -249,8 +259,6 @@ class MasterViewController: UITableViewController {
         tableView.insertRows(at: [indexPath], with: .automatic)
     }
 
-    // MARK: - Segues
-
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == "showDetail" {
             if let indexPath = tableView.indexPathForSelectedRow {
@@ -262,8 +270,6 @@ class MasterViewController: UITableViewController {
             }
         }
     }
-
-    // MARK: - Table View
 
     override func numberOfSections(in tableView: UITableView) -> Int {
         return 1

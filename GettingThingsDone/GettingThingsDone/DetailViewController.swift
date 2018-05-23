@@ -7,12 +7,15 @@
 //
 
 import UIKit
+import Foundation
+import MultipeerConnectivity
 
 class MyCell: UITableViewCell {
     @IBOutlet weak var myTextField: UITextField!
 }
 
 class DetailViewController: UITableViewController, UITextFieldDelegate {
+    var peerToPeer = PeerToPeerManager()
     
     let headers = ["TASK", "HISTORY", "COLLABORATORS", "PEERS"]
     
@@ -24,6 +27,8 @@ class DetailViewController: UITableViewController, UITextFieldDelegate {
     
     var text: String?
     var historyRecords = [Record]()
+    var collaberators = [String]()
+    var peers = [MCPeerID]()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -45,6 +50,17 @@ class DetailViewController: UITableViewController, UITextFieldDelegate {
             //self.tableView.reloadData()
             self.tableView.reloadSections(IndexSet(integer: 1), with: .automatic)
         }
+        nc.addObserver(forName: Notification.Name(rawValue: "Found Peer"), object: nil, queue: nil) { (notification) in
+            guard let userInfo = notification.userInfo,
+                let peerID = userInfo["peerID"] as? MCPeerID else {
+                    return
+            }
+            if self.peers.map({ $0 == peerID }).count > 0 || self.collaberators.map({ $0 == peerID.displayName}).count > 0 {
+                return
+            }
+            self.peers.insert(peerID, at: 0)
+            self.tableView.reloadSections(IndexSet(integer: 3), with: .automatic)
+        }
         
         guard let item = selectedItem else {
             historyRecords.insert(Record(description: "added"), at: 0)
@@ -52,6 +68,7 @@ class DetailViewController: UITableViewController, UITextFieldDelegate {
         }
         
         historyRecords = item.history
+        collaberators = item.collaborators
     }
     
     func saveChanges() {
@@ -60,7 +77,7 @@ class DetailViewController: UITableViewController, UITextFieldDelegate {
         }
         
         if let t = text {
-            delegator?.save(sectionOfSelectedItem: sectionOfSelectedItem, indexOfSelectedItem: indexOfSelectedItem, selectedItem: selectedItem, task: t, history: historyRecords, collaborators: [String]())
+            delegator?.save(sectionOfSelectedItem: sectionOfSelectedItem, indexOfSelectedItem: indexOfSelectedItem, selectedItem: selectedItem, task: t, history: historyRecords, collaborators: collaberators)
         }
         //tableView.reloadData()
         tableView.reloadSections(IndexSet(integer: 1), with: .automatic)
@@ -88,8 +105,10 @@ class DetailViewController: UITableViewController, UITextFieldDelegate {
             return 1
         } else if section == 1 {
             return historyRecords.count
+        } else if section == 2 {
+            return collaberators.count
         } else {
-            return 0
+            return peers.count
         }
     }
     
@@ -110,6 +129,12 @@ class DetailViewController: UITableViewController, UITextFieldDelegate {
             
             cell.myTextField.text = historyRecords[indexPath.row].description
             cell.myTextField.isEnabled = historyRecords[indexPath.row].editable
+        } else if indexPath.section == 2 {
+            cell.textLabel?.text = collaberators[indexPath.row]
+            cell.myTextField.isHidden = true
+        } else if indexPath.section == 3 {
+            cell.textLabel?.text = peers[indexPath.row].displayName
+            cell.myTextField.isHidden = true
         }
         
         let leadingConstraint = NSLayoutConstraint(
@@ -153,6 +178,15 @@ class DetailViewController: UITableViewController, UITextFieldDelegate {
         historyRecords.insert(Record(editable: true), at: 0)
         tableView.reloadSections(IndexSet(integer: 1), with: .automatic)
         //tableView.reloadData()
+    }
+    
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        if indexPath.section == 3 && collaberators.map({ $0 == (self.tableView(self.tableView, cellForRowAt: indexPath)).textLabel?.text}).count == 0 {
+            NotificationCenter.default.post(name: Notification.Name(rawValue: "Invite Peer"), object: self, userInfo: ["peerID": peers[indexPath.row]])
+            collaberators.insert(peers[indexPath.row].displayName, at: 0)
+            peers.remove(at: indexPath.row)
+            self.tableView.reloadData()
+        }
     }
     
     /*

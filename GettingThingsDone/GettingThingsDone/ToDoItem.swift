@@ -24,11 +24,13 @@ class ToDoItem: Codable {
     var task: String
     var history: [Record]
     var collaborators: [String]
+    let id: String
     
     init(task: String, history: [Record] = [Record](),
-         collaborators: [String] = [String]()) {
+         collaborators: [String] = [String](), id: String = UUID().uuidString) {
         self.task = task
         self.history = history
         self.collaborators = collaborators
+        self.id = id
     }
 }
