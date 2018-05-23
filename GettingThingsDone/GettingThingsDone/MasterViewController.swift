@@ -125,6 +125,7 @@ class MasterViewController: UITableViewController, toDoListProtocol, PeerToPeerM
         myTasks[fromSection].remove(at: fromRow)
         myTasks[toSection].insert(temp, at: toRow)
         tableView.reloadData()
+        peerToPeer.send(data: json(task: temp))
     }
     
     // MARK: - Segues
@@ -175,18 +176,29 @@ class MasterViewController: UITableViewController, toDoListProtocol, PeerToPeerM
             selectedItem?.task = task
        }
         selectedItem?.history = fliteredHistory
+        selectedItem?.collaborators = collaborators
         tableView.reloadData()
         peerToPeer.send(data: json(task: selectedItem!))
     }
     
     func manager(_ manager: PeerToPeerManager, didReceive data: Data) {
         let temp = json(data)
+        var flag = false
         for i in 0 ... 1 {
-            for j in 0 ... myTasks[i].count {
+            for j in 0 ... myTasks[i].count - 1 {
                 if (temp.id == myTasks[i][j].id) {
+                    for k in 0 ... temp.collaborators.count - 1 {
+                        if (temp.collaborators[k] == peerToPeer.peerId.displayName) {
+                            temp.collaborators.remove(at: k)
+                        }
+                    }
                     myTasks[i][j] = temp
+                    flag = true
                 }
             }
+        }
+        if !flag {
+            myTasks[0].insert(temp, at: 0)
         }
         tableView.reloadData()
     }

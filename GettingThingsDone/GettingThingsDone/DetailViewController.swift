@@ -39,18 +39,7 @@ class DetailViewController: UITableViewController, UITextFieldDelegate {
         // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
         // self.navigationItem.rightBarButtonItem = self.editButtonItem\
         
-        if let t = selectedItem?.task {
-            text = t
-        }
-        
-        let nc = NotificationCenter.default
-        let notificationName = Notification.Name(rawValue: "SelectedItem Completed")
-        nc.addObserver(forName: notificationName, object: nil, queue: nil) { _ in
-            self.historyRecords.insert(Record(description: "completed"), at: 0)
-            //self.tableView.reloadData()
-            self.tableView.reloadSections(IndexSet(integer: 1), with: .automatic)
-        }
-        nc.addObserver(forName: Notification.Name(rawValue: "Found Peer"), object: nil, queue: nil) { (notification) in
+        NotificationCenter.default.addObserver(forName: Notification.Name(rawValue: "Found Peer"), object: nil, queue: nil) { (notification) in
             guard let userInfo = notification.userInfo,
                 let peerID = userInfo["peerID"] as? MCPeerID else {
                     return
@@ -60,6 +49,17 @@ class DetailViewController: UITableViewController, UITextFieldDelegate {
             }
             self.peers.insert(peerID, at: 0)
             self.tableView.reloadSections(IndexSet(integer: 3), with: .automatic)
+        }
+        
+        if let t = selectedItem?.task {
+            text = t
+        }
+        
+        let notificationName = Notification.Name(rawValue: "SelectedItem Completed")
+        NotificationCenter.default.addObserver(forName: notificationName, object: nil, queue: nil) { _ in
+            self.historyRecords.insert(Record(description: "completed"), at: 0)
+            //self.tableView.reloadData()
+            self.tableView.reloadSections(IndexSet(integer: 1), with: .automatic)
         }
         
         guard let item = selectedItem else {
@@ -186,6 +186,7 @@ class DetailViewController: UITableViewController, UITextFieldDelegate {
             collaberators.insert(peers[indexPath.row].displayName, at: 0)
             peers.remove(at: indexPath.row)
             self.tableView.reloadData()
+            saveChanges()
         }
     }
     

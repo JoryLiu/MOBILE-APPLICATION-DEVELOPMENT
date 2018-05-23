@@ -18,7 +18,7 @@ class PeerToPeerManager: NSObject {
     
     var delegate: PeerToPeerManagerDelegate?
     
-    private let peerId = MCPeerID(displayName: "Zhaorui")
+    let peerId = MCPeerID(displayName: "Zhaorui")
     private let serviceAdvertiser: MCNearbyServiceAdvertiser
     private let serviceBrowser: MCNearbyServiceBrowser
     
