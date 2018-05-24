@@ -34,6 +34,9 @@ class MasterViewController: UITableViewController, toDoListProtocol, PeerToPeerM
         }
         // initialization()
         peerToPeer.delegate = self
+        NotificationCenter.default.addObserver(forName: Notification.Name(rawValue: "Reload TableView"), object: nil, queue: nil) { _ in
+            self.tableView.reloadData()
+        }
     }
     
     func initialization() {
@@ -120,12 +123,12 @@ class MasterViewController: UITableViewController, toDoListProtocol, PeerToPeerM
                     NotificationCenter.default.post(name: notificationName, object: self)
                 }
             }
+            peerToPeer.send(data: json(task: temp))
         }
         
         myTasks[fromSection].remove(at: fromRow)
         myTasks[toSection].insert(temp, at: toRow)
         tableView.reloadData()
-        peerToPeer.send(data: json(task: temp))
     }
     
     // MARK: - Segues
@@ -185,6 +188,9 @@ class MasterViewController: UITableViewController, toDoListProtocol, PeerToPeerM
         let temp = json(data)
         var flag = false
         for i in 0 ... 1 {
+            if myTasks[i].isEmpty {
+                continue
+            }
             for j in 0 ... myTasks[i].count - 1 {
                 if (temp.id == myTasks[i][j].id) {
                     for k in 0 ... temp.collaborators.count - 1 {
@@ -200,7 +206,7 @@ class MasterViewController: UITableViewController, toDoListProtocol, PeerToPeerM
         if !flag {
             myTasks[0].insert(temp, at: 0)
         }
-        tableView.reloadData()
+        NotificationCenter.default.post(name: Notification.Name(rawValue: "Reload TableView"), object: self)
     }
     
     // MARK: - Data

@@ -39,17 +39,18 @@ class PeerToPeerManager: NSObject {
     }
     
     lazy var session: MCSession = {
-        let session = MCSession(peer: peerId, securityIdentity: nil, encryptionPreference: .required)
+        let session = MCSession(peer: peerId, securityIdentity: nil, encryptionPreference: .none)
         session.delegate = self
         return session
     }()
     
-    func invite(peer: MCPeerID, timeout t: TimeInterval = 10) {
+    func invite(peer: MCPeerID, timeout t: TimeInterval = 100) {
         print("Inviting \(peer)")
         serviceBrowser.invitePeer(peer, to: session, withContext: nil, timeout: t)
     }
     
     func send(data: Data) {
+        guard !session.connectedPeers.isEmpty else { return }
         do {
             try session.send(data, toPeers: session.connectedPeers, with: .reliable)
         } catch {
@@ -94,6 +95,10 @@ extension PeerToPeerManager: MCSessionDelegate {
     func session(_ session: MCSession, didFinishReceivingResourceWithName resourceName: String, fromPeer peerID: MCPeerID, at localURL: URL?, withError error: Error?) {
         print("Finished receiving resource \(resourceName)")
     }
+    
+    func session(_ session: MCSession, didReceiveCertificate certificate: [Any]?, fromPeer peerID: MCPeerID, certificateHandler: @escaping (Bool) -> Void) {
+        certificateHandler(true)
+    }
 }
 
 extension PeerToPeerManager: MCNearbyServiceBrowserDelegate {
@@ -102,16 +107,19 @@ extension PeerToPeerManager: MCNearbyServiceBrowserDelegate {
             return
         }
         print("Found \(peerID.displayName)")
-        let notificationName = Notification.Name(rawValue: "Found Peer")
-        NotificationCenter.default.post(name: notificationName, object: self, userInfo: ["peerID": peerID])
-        
-        NotificationCenter.default.addObserver(forName: Notification.Name(rawValue: "Invite Peer"), object: nil, queue: nil) { (notification) in
-            guard let userInfo = notification.userInfo,
-                let collaborator = userInfo["peerID"] as? MCPeerID else {
-                    return
-            }
-            self.invite(peer: collaborator)
-        }
+        invite(peer: peerID)
+//        let notificationName = Notification.Name(rawValue: "Found Peer")
+//        NotificationCenter.default.post(name: notificationName, object: self, userInfo: ["peerID": peerID])
+//
+//        NotificationCenter.default.addObserver(forName: Notification.Name(rawValue: "Invite Peer"), object: nil, queue: nil) { (notification) in
+//            guard let userInfo = notification.userInfo,
+//                let collaborator = userInfo["peerID"] as? MCPeerID else {
+//                    return
+//            }
+//            if collaborator.displayName == peerID.displayName {
+//                self.invite(peer: peerID)
+//            }
+//        }
     }
     
     func browser(_ browser: MCNearbyServiceBrowser, lostPeer peerID: MCPeerID) {
