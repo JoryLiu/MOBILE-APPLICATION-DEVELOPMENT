@@ -17,6 +17,7 @@ class PeerToPeerManager: NSObject {
     static let serviceType = "todo-list"
     
     var delegate: PeerToPeerManagerDelegate?
+    var waitingList = [String]()
     
     let peerId = MCPeerID(displayName: "Zhaorui")
     private let serviceAdvertiser: MCNearbyServiceAdvertiser
@@ -108,16 +109,16 @@ extension PeerToPeerManager: MCNearbyServiceBrowserDelegate {
         }
         print("Found \(peerID.displayName)")
         invite(peer: peerID)
-//        let notificationName = Notification.Name(rawValue: "Found Peer")
-//        NotificationCenter.default.post(name: notificationName, object: self, userInfo: ["peerID": peerID])
-//
+        let notificationName = Notification.Name(rawValue: "Found Peer")
+        NotificationCenter.default.post(name: notificationName, object: self, userInfo: ["displayName": peerID.displayName])
+
 //        NotificationCenter.default.addObserver(forName: Notification.Name(rawValue: "Invite Peer"), object: nil, queue: nil) { (notification) in
 //            guard let userInfo = notification.userInfo,
-//                let collaborator = userInfo["peerID"] as? MCPeerID else {
+//                let displayName = userInfo["displayName"] as? String else {
 //                    return
 //            }
-//            if collaborator.displayName == peerID.displayName {
-//                self.invite(peer: peerID)
+//            if displayName == peerID.displayName {
+//                self.waitingList.insert(displayName, at: 0)
 //            }
 //        }
     }

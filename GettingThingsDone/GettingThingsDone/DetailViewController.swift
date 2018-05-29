@@ -28,7 +28,7 @@ class DetailViewController: UITableViewController, UITextFieldDelegate {
     var text: String?
     var historyRecords = [Record]()
     var collaberators = [String]()
-    var peers = [MCPeerID]()
+    var peers = [String]()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -41,13 +41,13 @@ class DetailViewController: UITableViewController, UITextFieldDelegate {
         
         NotificationCenter.default.addObserver(forName: Notification.Name(rawValue: "Found Peer"), object: nil, queue: nil) { (notification) in
             guard let userInfo = notification.userInfo,
-                let peerID = userInfo["peerID"] as? MCPeerID else {
+                let displayName = userInfo["displayName"] as? String else {
                     return
             }
-            if self.peers.map({ $0 == peerID }).count > 0 || self.collaberators.map({ $0 == peerID.displayName}).count > 0 {
+            if self.peers.map({ $0 == displayName }).count > 0 || self.collaberators.map({ $0 == displayName}).count > 0 {
                 return
             }
-            self.peers.insert(peerID, at: 0)
+            self.peers.insert(displayName, at: 0)
             self.tableView.reloadSections(IndexSet(integer: 3), with: .automatic)
         }
         
@@ -122,7 +122,7 @@ class DetailViewController: UITableViewController, UITextFieldDelegate {
         } else if indexPath.section == 1 {
             let dateFormatter = DateFormatter()
             dateFormatter.dateFormat = "M/dd/yy, HH:mm a"
-            cell.textLabel?.text = dateFormatter.string(from: historyRecords[indexPath.row].time as! Date)
+//            cell.textLabel?.text = dateFormatter.string(from: historyRecords[indexPath.row].time as! Date)
             
             cell.myTextField.layer.position = CGPoint(x: 500, y: 0)
             offSet = 150
@@ -133,7 +133,7 @@ class DetailViewController: UITableViewController, UITextFieldDelegate {
             cell.textLabel?.text = collaberators[indexPath.row]
             cell.myTextField.isHidden = true
         } else if indexPath.section == 3 {
-            cell.textLabel?.text = peers[indexPath.row].displayName
+            cell.textLabel?.text = peers[indexPath.row]
             cell.myTextField.isHidden = true
         }
         
@@ -182,8 +182,8 @@ class DetailViewController: UITableViewController, UITextFieldDelegate {
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         if indexPath.section == 3 && collaberators.map({ $0 == (self.tableView(self.tableView, cellForRowAt: indexPath)).textLabel?.text}).count == 0 {
-            NotificationCenter.default.post(name: Notification.Name(rawValue: "Invite Peer"), object: self, userInfo: ["peerID": peers[indexPath.row]])
-            collaberators.insert(peers[indexPath.row].displayName, at: 0)
+            NotificationCenter.default.post(name: Notification.Name(rawValue: "Invite Peer"), object: self, userInfo: ["displayName": peers[indexPath.row]])
+            collaberators.insert(peers[indexPath.row], at: 0)
             peers.remove(at: indexPath.row)
             self.tableView.reloadData()
             saveChanges()
