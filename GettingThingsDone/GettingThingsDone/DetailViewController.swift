@@ -113,40 +113,49 @@ class DetailViewController: UITableViewController, UITextFieldDelegate {
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "Cell", for: indexPath) as! MyCell
-        
+        var cell: MyCell!
         // Configure the cell..
         var offSet: CGFloat = 0
         if indexPath.section == 0 {
+            cell = tableView.dequeueReusableCell(withIdentifier: "taskCell", for: indexPath) as! MyCell
+
             cell.myTextField.text = selectedItem?.task
         } else if indexPath.section == 1 {
+            cell = tableView.dequeueReusableCell(withIdentifier: "logCell", for: indexPath) as! MyCell
+
             let dateFormatter = DateFormatter()
             dateFormatter.dateFormat = "M/dd/yy, HH:mm a"
-//            cell.textLabel?.text = dateFormatter.string(from: historyRecords[indexPath.row].time as! Date)
+            cell.textLabel?.text = dateFormatter.string(from: historyRecords[indexPath.row].time as! Date)
             
             cell.myTextField.layer.position = CGPoint(x: 500, y: 0)
             offSet = 150
             
             cell.myTextField.text = historyRecords[indexPath.row].description
             cell.myTextField.isEnabled = historyRecords[indexPath.row].editable
+            
+            let leadingConstraint = NSLayoutConstraint(
+                item: cell.myTextField,
+                attribute: NSLayoutAttribute.leading,
+                relatedBy: .equal,
+                toItem: cell.contentView,
+                attribute: .leadingMargin,
+                multiplier: 1.0,
+                constant: offSet
+            )
+            cell.contentView.addConstraint(leadingConstraint)
+            
         } else if indexPath.section == 2 {
+            cell = tableView.dequeueReusableCell(withIdentifier: "peerCell", for: indexPath) as! MyCell
+
             cell.textLabel?.text = collaberators[indexPath.row]
-            cell.myTextField.isHidden = true
+//            cell.myTextField.isHidden = true
         } else if indexPath.section == 3 {
+            cell = tableView.dequeueReusableCell(withIdentifier: "peerCell", for: indexPath) as! MyCell
             cell.textLabel?.text = peers[indexPath.row]
-            cell.myTextField.isHidden = true
+//            cell.myTextField.isHidden = true
         }
         
-        let leadingConstraint = NSLayoutConstraint(
-            item: cell.myTextField,
-            attribute: NSLayoutAttribute.leading,
-            relatedBy: .equal,
-            toItem: cell.contentView,
-            attribute: .leadingMargin,
-            multiplier: 1.0,
-            constant: offSet
-        )
-        cell.contentView.addConstraint(leadingConstraint)
+
         
         return cell
     }

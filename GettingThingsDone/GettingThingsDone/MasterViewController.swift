@@ -152,6 +152,7 @@ class MasterViewController: UITableViewController, toDoListProtocol, PeerToPeerM
                 dvc.indexOfSelectedItem = indexOfSelectedItem
                 dvc.selectedItem = myTasks[i][j]
             }
+        } else if segue.identifier == "addTask" {
         }
         
     }
@@ -207,6 +208,7 @@ class MasterViewController: UITableViewController, toDoListProtocol, PeerToPeerM
             myTasks[0].insert(temp, at: 0)
         }
         NotificationCenter.default.post(name: Notification.Name(rawValue: "Reload TableView"), object: self)
+        dvc.tableView.reloadData()
     }
     
     // MARK: - Data
@@ -221,6 +223,9 @@ class MasterViewController: UITableViewController, toDoListProtocol, PeerToPeerM
         return try! JSONDecoder().decode(ToDoItem.self, from: data)
     }
     
+    @IBAction func addNewTask(_ sender: UIBarButtonItem) {
+        
+    }
     /*
      // Override to support conditional rearranging of the table view.
      override func tableView(_ tableView: UITableView, canMoveRowAt indexPath: IndexPath) -> Bool {
