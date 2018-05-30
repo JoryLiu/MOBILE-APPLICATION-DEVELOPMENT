@@ -11,6 +11,7 @@ import MultipeerConnectivity
 
 protocol PeerToPeerManagerDelegate: AnyObject {
     func manager(_ manager: PeerToPeerManager, didReceive data: Data)
+    func updatePeers(_ manager: PeerToPeerManager)
 }
 
 class PeerToPeerManager: NSObject {
@@ -19,7 +20,7 @@ class PeerToPeerManager: NSObject {
     var delegate: PeerToPeerManagerDelegate?
     var waitingList = [String]()
     
-    let peerId = MCPeerID(displayName: "Zhaorui")
+    let peerId = MCPeerID(displayName: "Zhaorui Liu")
     private let serviceAdvertiser: MCNearbyServiceAdvertiser
     private let serviceBrowser: MCNearbyServiceBrowser
     
@@ -50,15 +51,15 @@ class PeerToPeerManager: NSObject {
         serviceBrowser.invitePeer(peer, to: session, withContext: nil, timeout: t)
     }
     
-    func send(data: Data) {
-        guard !session.connectedPeers.isEmpty else { return }
+    func send(data: Data, toPeers: [MCPeerID]) {
+        guard !toPeers.isEmpty else { return }
         do {
-            try session.send(data, toPeers: session.connectedPeers, with: .reliable)
+            try session.send(data, toPeers: toPeers, with: .reliable)
         } catch {
             print("Error '\(error)' sending \(data.count) bytes of data")
         }
-        
     }
+    
 }
 
 extension PeerToPeerManager: MCNearbyServiceAdvertiserDelegate {
@@ -109,18 +110,7 @@ extension PeerToPeerManager: MCNearbyServiceBrowserDelegate {
         }
         print("Found \(peerID.displayName)")
         invite(peer: peerID)
-        let notificationName = Notification.Name(rawValue: "Found Peer")
-        NotificationCenter.default.post(name: notificationName, object: self, userInfo: ["displayName": peerID.displayName])
-
-//        NotificationCenter.default.addObserver(forName: Notification.Name(rawValue: "Invite Peer"), object: nil, queue: nil) { (notification) in
-//            guard let userInfo = notification.userInfo,
-//                let displayName = userInfo["displayName"] as? String else {
-//                    return
-//            }
-//            if displayName == peerID.displayName {
-//                self.waitingList.insert(displayName, at: 0)
-//            }
-//        }
+        delegate?.updatePeers(self)
     }
     
     func browser(_ browser: MCNearbyServiceBrowser, lostPeer peerID: MCPeerID) {

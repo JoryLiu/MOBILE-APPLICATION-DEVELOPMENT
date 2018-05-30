@@ -15,8 +15,6 @@ class MyCell: UITableViewCell {
 }
 
 class DetailViewController: UITableViewController, UITextFieldDelegate {
-    var peerToPeer = PeerToPeerManager()
-    
     let headers = ["TASK", "HISTORY", "COLLABORATORS", "PEERS"]
     
     var sectionOfSelectedItem: Int?
@@ -28,7 +26,7 @@ class DetailViewController: UITableViewController, UITextFieldDelegate {
     var text: String?
     var historyRecords = [Record]()
     var collaberators = [String]()
-    var peers = [String]()
+    var peers: [MCPeerID]?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -37,19 +35,7 @@ class DetailViewController: UITableViewController, UITextFieldDelegate {
         // self.clearsSelectionOnViewWillAppear = false
         
         // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
-        // self.navigationItem.rightBarButtonItem = self.editButtonItem\
-        
-        NotificationCenter.default.addObserver(forName: Notification.Name(rawValue: "Found Peer"), object: nil, queue: nil) { (notification) in
-            guard let userInfo = notification.userInfo,
-                let displayName = userInfo["displayName"] as? String else {
-                    return
-            }
-            if self.peers.map({ $0 == displayName }).count > 0 || self.collaberators.map({ $0 == displayName}).count > 0 {
-                return
-            }
-            self.peers.insert(displayName, at: 0)
-            self.tableView.reloadSections(IndexSet(integer: 3), with: .automatic)
-        }
+        // self.navigationItem.rightBarButtonItem = self.editButtonItem
         
         if let t = selectedItem?.task {
             text = t
@@ -63,7 +49,6 @@ class DetailViewController: UITableViewController, UITextFieldDelegate {
         }
         
         guard let item = selectedItem else {
-            historyRecords.insert(Record(description: "added"), at: 0)
             return
         }
         
@@ -82,10 +67,6 @@ class DetailViewController: UITableViewController, UITextFieldDelegate {
         //tableView.reloadData()
         tableView.reloadSections(IndexSet(integer: 1), with: .automatic)
     }
-    
-//    override func viewWillDisappear(_ animated: Bool) {
-//        saveChanges()
-//    }
     
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
@@ -106,9 +87,12 @@ class DetailViewController: UITableViewController, UITextFieldDelegate {
         } else if section == 1 {
             return historyRecords.count
         } else if section == 2 {
-            return collaberators.count
+            return collaberators.count - 1
         } else {
-            return peers.count
+            guard let p = peers else {
+                return 0
+            }
+            return p.count
         }
     }
     
@@ -125,7 +109,7 @@ class DetailViewController: UITableViewController, UITextFieldDelegate {
 
             let dateFormatter = DateFormatter()
             dateFormatter.dateFormat = "M/dd/yy, HH:mm a"
-            cell.textLabel?.text = dateFormatter.string(from: historyRecords[indexPath.row].time as! Date)
+            cell.textLabel?.text = dateFormatter.string(from: historyRecords[indexPath.row].time)
             
             cell.myTextField.layer.position = CGPoint(x: 500, y: 0)
             offSet = 150
@@ -147,15 +131,11 @@ class DetailViewController: UITableViewController, UITextFieldDelegate {
         } else if indexPath.section == 2 {
             cell = tableView.dequeueReusableCell(withIdentifier: "peerCell", for: indexPath) as! MyCell
 
-            cell.textLabel?.text = collaberators[indexPath.row]
-//            cell.myTextField.isHidden = true
+            cell.textLabel?.text = collaberators[indexPath.row + 1]
         } else if indexPath.section == 3 {
             cell = tableView.dequeueReusableCell(withIdentifier: "peerCell", for: indexPath) as! MyCell
-            cell.textLabel?.text = peers[indexPath.row]
-//            cell.myTextField.isHidden = true
+            cell.textLabel?.text = peers![indexPath.row].displayName
         }
-        
-
         
         return cell
     }
@@ -177,7 +157,7 @@ class DetailViewController: UITableViewController, UITextFieldDelegate {
                 historyRecords.insert(renameRecord, at: 0)
             }
         } else if indexPath?.section == 1 {
-            historyRecords[0].description = textField.text!
+            historyRecords[(indexPath?.row)!].description = textField.text!
         }
         saveChanges()
         return true
@@ -186,14 +166,14 @@ class DetailViewController: UITableViewController, UITextFieldDelegate {
     @IBAction func addhistory(_ sender: UIBarButtonItem) {
         historyRecords.insert(Record(editable: true), at: 0)
         tableView.reloadSections(IndexSet(integer: 1), with: .automatic)
-        //tableView.reloadData()
     }
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        if indexPath.section == 3 && collaberators.map({ $0 == (self.tableView(self.tableView, cellForRowAt: indexPath)).textLabel?.text}).count == 0 {
-            NotificationCenter.default.post(name: Notification.Name(rawValue: "Invite Peer"), object: self, userInfo: ["displayName": peers[indexPath.row]])
-            collaberators.insert(peers[indexPath.row], at: 0)
-            peers.remove(at: indexPath.row)
+        let cell = self.tableView(self.tableView, cellForRowAt: indexPath)
+        let text = cell.textLabel?.text
+        
+        if indexPath.section == 3 && collaberators.index(of: text!) == nil {
+            collaberators.insert(peers![indexPath.row].displayName, at: 1)
             self.tableView.reloadData()
             saveChanges()
         }

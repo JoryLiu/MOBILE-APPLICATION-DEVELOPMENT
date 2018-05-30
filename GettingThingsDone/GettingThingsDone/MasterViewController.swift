@@ -8,6 +8,7 @@
 
 import UIKit
 import Foundation
+import MultipeerConnectivity
 
 class MasterViewController: UITableViewController, toDoListProtocol, PeerToPeerManagerDelegate {
     var peerToPeer = PeerToPeerManager()
@@ -34,9 +35,6 @@ class MasterViewController: UITableViewController, toDoListProtocol, PeerToPeerM
         }
         // initialization()
         peerToPeer.delegate = self
-        NotificationCenter.default.addObserver(forName: Notification.Name(rawValue: "Reload TableView"), object: nil, queue: nil) { _ in
-            self.tableView.reloadData()
-        }
     }
     
     func initialization() {
@@ -123,7 +121,7 @@ class MasterViewController: UITableViewController, toDoListProtocol, PeerToPeerM
                     NotificationCenter.default.post(name: notificationName, object: self)
                 }
             }
-            peerToPeer.send(data: json(task: temp))
+            syncWithCollaborators(item: temp)
         }
         
         myTasks[fromSection].remove(at: fromRow)
@@ -140,21 +138,17 @@ class MasterViewController: UITableViewController, toDoListProtocol, PeerToPeerM
         dvc.navigationItem.leftItemsSupplementBackButton = true
         dvc.navigationItem.leftBarButtonItem = splitViewController?.displayModeButtonItem
         dvc.delegator = self
+        dvc.peers = peerToPeer.session.connectedPeers
         
-        if segue.identifier == "showDetail" {
-            
-            let cell = sender as! UITableViewCell
-            let indexPath: IndexPath = tableView.indexPath(for: cell)!
-            indexOfSelectedItem = indexPath.row
-            sectionOfSelectedItem = indexPath.section
-            if let i = sectionOfSelectedItem, let j = indexOfSelectedItem {
-                dvc.sectionOfSelectedItem = i
-                dvc.indexOfSelectedItem = indexOfSelectedItem
-                dvc.selectedItem = myTasks[i][j]
-            }
-        } else if segue.identifier == "addTask" {
+        let cell = sender as! UITableViewCell
+        let indexPath: IndexPath = tableView.indexPath(for: cell)!
+        indexOfSelectedItem = indexPath.row
+        sectionOfSelectedItem = indexPath.section
+        if let i = sectionOfSelectedItem, let j = indexOfSelectedItem {
+            dvc.sectionOfSelectedItem = i
+            dvc.indexOfSelectedItem = indexOfSelectedItem
+            dvc.selectedItem = myTasks[i][j]
         }
-        
     }
     
     // MARK: - Protocl
@@ -162,31 +156,24 @@ class MasterViewController: UITableViewController, toDoListProtocol, PeerToPeerM
     func save(sectionOfSelectedItem: Int?, indexOfSelectedItem: Int?, selectedItem: ToDoItem?,
               task: String, history: [Record], collaborators: [String]) {
         let fliteredHistory = history.filter {$0.description != ""}
-        guard sectionOfSelectedItem != nil else {
-            myTasks[0].insert(ToDoItem(task: task, history: fliteredHistory), at: 0)
-            tableView.reloadData()
-            peerToPeer.send(data: json(task: myTasks[0][0]))
-            
-            self.sectionOfSelectedItem = 0
-            self.indexOfSelectedItem = 0
-            
-            return
-        }
         
         if selectedItem?.task != task {
-//            let renameRecord:Record = Record(description: "changed to \(task)")
-//            fliteredHistory.insert(renameRecord, at: 0)
-//            //            myTasks[s][indexOfSelectedItem!].task = task
             selectedItem?.task = task
        }
         selectedItem?.history = fliteredHistory
         selectedItem?.collaborators = collaborators
         tableView.reloadData()
-        peerToPeer.send(data: json(task: selectedItem!))
+        syncWithCollaborators(item: selectedItem!)
     }
     
     func manager(_ manager: PeerToPeerManager, didReceive data: Data) {
         let temp = json(data)
+        for k in 0 ... temp.collaborators.count - 1 {
+            if (temp.collaborators[k] == peerToPeer.peerId.displayName) {
+                temp.collaborators.remove(at: k)
+                temp.collaborators.insert(peerToPeer.peerId.displayName, at: 0)
+            }
+        }
         var flag = false
         for i in 0 ... 1 {
             if myTasks[i].isEmpty {
@@ -194,11 +181,6 @@ class MasterViewController: UITableViewController, toDoListProtocol, PeerToPeerM
             }
             for j in 0 ... myTasks[i].count - 1 {
                 if (temp.id == myTasks[i][j].id) {
-                    for k in 0 ... temp.collaborators.count - 1 {
-                        if (temp.collaborators[k] == peerToPeer.peerId.displayName) {
-                            temp.collaborators.remove(at: k)
-                        }
-                    }
                     myTasks[i][j] = temp
                     flag = true
                 }
@@ -207,123 +189,43 @@ class MasterViewController: UITableViewController, toDoListProtocol, PeerToPeerM
         if !flag {
             myTasks[0].insert(temp, at: 0)
         }
-        NotificationCenter.default.post(name: Notification.Name(rawValue: "Reload TableView"), object: self)
-        dvc.tableView.reloadData()
+        tableView.reloadData()
+        detailViewController?.tableView.reloadData()
+    }
+    
+    func updatePeers(_ manager: PeerToPeerManager) {
+        detailViewController?.peers = peerToPeer.session.connectedPeers
+        detailViewController?.tableView.reloadData()
     }
     
     // MARK: - Data
     
-    func json(task: ToDoItem) -> Data {
-//        get { return try! JSONEncoder().encode(myTasks) }
-//        set { myTasks = [try! JSONDecoder().decode(Array<ToDoItem>.self, from: newValue)]}
-        return try! JSONEncoder().encode(task)
+    func json(item: ToDoItem) -> Data {
+        return try! JSONEncoder().encode(item)
     }
     
     func json(_ data: Data)-> ToDoItem {
         return try! JSONDecoder().decode(ToDoItem.self, from: data)
     }
     
-    @IBAction func addNewTask(_ sender: UIBarButtonItem) {
-        
-    }
-    /*
-     // Override to support conditional rearranging of the table view.
-     override func tableView(_ tableView: UITableView, canMoveRowAt indexPath: IndexPath) -> Bool {
-     // Return false if you do not want the item to be re-orderable.
-     return true
-     }
-     */
-    
-    /*
-     
-     // In a storyboard-based application, you will often want to do a little preparation before navigation
-     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-     // Get the new view controller using segue.destinationViewController.
-     // Pass the selected object to the new view controller.
-     }
-     */
-    
-}
-
-/*
-class MasterViewController: UITableViewController {
-
-    var detailViewController: DetailViewController? = nil
-    var objects = [Any]()
-
-
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        // Do any additional setup after loading the view, typically from a nib.
-        navigationItem.leftBarButtonItem = editButtonItem
-
-        let addButton = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(insertNewObject(_:)))
-        navigationItem.rightBarButtonItem = addButton
-        if let split = splitViewController {
-            let controllers = split.viewControllers
-            detailViewController = (controllers[controllers.count-1] as! UINavigationController).topViewController as? DetailViewController
-        }
-    }
-
-    override func viewWillAppear(_ animated: Bool) {
-        clearsSelectionOnViewWillAppear = splitViewController!.isCollapsed
-        super.viewWillAppear(animated)
-    }
-
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
-    }
-
-    @objc
-    func insertNewObject(_ sender: Any) {
-        objects.insert(NSDate(), at: 0)
-        let indexPath = IndexPath(row: 0, section: 0)
-        tableView.insertRows(at: [indexPath], with: .automatic)
-    }
-
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        if segue.identifier == "showDetail" {
-            if let indexPath = tableView.indexPathForSelectedRow {
-                let object = objects[indexPath.row] as! NSDate
-                let controller = (segue.destination as! UINavigationController).topViewController as! DetailViewController
-                controller.detailItem = object
-                controller.navigationItem.leftBarButtonItem = splitViewController?.displayModeButtonItem
-                controller.navigationItem.leftItemsSupplementBackButton = true
+    func syncWithCollaborators(item: ToDoItem) {
+        var toPeers = [MCPeerID]()
+        for peer in peerToPeer.session.connectedPeers {
+            if item.collaborators.index(of: peer.displayName) != nil && item.collaborators.index(of: peer.displayName) != 0 {
+                toPeers.append(peer)
             }
         }
+        peerToPeer.send(data: json(item: item), toPeers: toPeers)
     }
-
-    override func numberOfSections(in tableView: UITableView) -> Int {
-        return 1
+    
+    @IBAction func addNewTask(_ sender: UIBarButtonItem) {
+        let addRecord = Record(description: "added")
+        var records = [Record]()
+        records.append(addRecord)
+        var collaborators = [String]()
+        collaborators.append(peerToPeer.peerId.displayName)
+        myTasks[0].insert(ToDoItem(task: "Todo Item", history: records, collaborators: collaborators), at: 0)
+        tableView.reloadData()
     }
-
-    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return objects.count
-    }
-
-    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "Cell", for: indexPath)
-
-        let object = objects[indexPath.row] as! NSDate
-        cell.textLabel!.text = object.description
-        return cell
-    }
-
-    override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
-        // Return false if you do not want the specified item to be editable.
-        return true
-    }
-
-    override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCellEditingStyle, forRowAt indexPath: IndexPath) {
-        if editingStyle == .delete {
-            objects.remove(at: indexPath.row)
-            tableView.deleteRows(at: [indexPath], with: .fade)
-        } else if editingStyle == .insert {
-            // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view.
-        }
-    }
-
 
 }
-*/
