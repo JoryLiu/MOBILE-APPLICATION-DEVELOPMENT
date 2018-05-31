@@ -10,23 +10,36 @@ import UIKit
 import Foundation
 import MultipeerConnectivity
 
+/// The custom tableView cell
 class MyCell: UITableViewCell {
+    /// The outlet of the textField in the cell
     @IBOutlet weak var myTextField: UITextField!
 }
 
+/// View controller to control detail view
 class DetailViewController: UITableViewController, UITextFieldDelegate {
+    /// Titles of sections
     let headers = ["TASK", "HISTORY", "COLLABORATORS", "PEERS"]
+    /// The displayName of this device
     var displayName: String?
     
+    /// The section of selected item (nil for none)
     var sectionOfSelectedItem: Int?
+    /// The index of selected item (nil for none)
     var indexOfSelectedItem: Int?
+    /// The selected item object (nil for none)
     var selectedItem: ToDoItem?
     
+    /// Use protocol to pass parameters from TableViewController to ViewController
     var delegator: toDoListProtocol?
     
+    /// The text in the textfield
     var text: String?
+    /// The history records of selected item
     var historyRecords = [Record]()
+    /// The array storing displayNames of collaborators
     var collaborators = [String]()
+    /// The array storing peers' identities of potential peers
     var peers: [MCPeerID]?
     
     override func viewDidLoad() {
@@ -57,6 +70,7 @@ class DetailViewController: UITableViewController, UITextFieldDelegate {
         collaborators = item.collaborators
     }
     
+    /// To save changes made on the selected item
     func saveChanges() {
         guard text != "" else {
             return
@@ -164,6 +178,11 @@ class DetailViewController: UITableViewController, UITextFieldDelegate {
         return true
     }
     
+    /**
+     To add a new history record
+     
+     - Parameter sender: The UI object sending this action
+     */
     @IBAction func addhistory(_ sender: UIBarButtonItem) {
         historyRecords.insert(Record(editable: true), at: 0)
         tableView.reloadSections(IndexSet(integer: 1), with: .automatic)

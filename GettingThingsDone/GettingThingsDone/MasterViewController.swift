@@ -10,15 +10,22 @@ import UIKit
 import Foundation
 import MultipeerConnectivity
 
+/// View controller to control master view
 class MasterViewController: UITableViewController, toDoListProtocol, PeerToPeerManagerDelegate {
+    /// The P2P manager
     var peerToPeer = PeerToPeerManager()
     
+    /// View controller to control detail view
     var detailViewController: DetailViewController? = nil
     
+    /// Titles of sections
     let headers = ["YET TO DO", "COMPLETED"]
+    /// An array for storing toDoListItem
     var myTasks = [[ToDoItem](), [ToDoItem]()]
     
+    /// The section of selected item (nil for none)
     var sectionOfSelectedItem: Int?
+    /// The index of selected item (nil for none)
     var indexOfSelectedItem: Int?
     
     override func viewDidLoad() {
@@ -226,14 +233,29 @@ class MasterViewController: UITableViewController, toDoListProtocol, PeerToPeerM
     
     // MARK: - Data
     
+    /**
+     To encode data
+     
+     - Parameter item: The item needs to be encoded
+     */
     func json(item: ToDoItem) -> Data {
         return try! JSONEncoder().encode(item)
     }
     
+    /**
+     To decode data
+     
+     - Parameter data: The data needs to be decoded
+     */
     func json(_ data: Data)-> ToDoItem {
         return try! JSONDecoder().decode(ToDoItem.self, from: data)
     }
     
+    /**
+     To sychronize the changes with collaborators
+     
+     - Parameter item: The item needs to be sent
+     */
     func syncWithCollaborators(item: ToDoItem) {
         var toPeers = [MCPeerID]()
         for peer in peerToPeer.session.connectedPeers {
@@ -244,6 +266,11 @@ class MasterViewController: UITableViewController, toDoListProtocol, PeerToPeerM
         peerToPeer.send(data: json(item: item), toPeers: toPeers)
     }
     
+    /**
+     To add a new task
+     
+     - Parameter sender: The UI object sending this action
+     */
     @IBAction func addNewTask(_ sender: UIBarButtonItem) {
         let addRecord = Record(description: peerToPeer.peerId.displayName + " added")
         var records = [Record]()

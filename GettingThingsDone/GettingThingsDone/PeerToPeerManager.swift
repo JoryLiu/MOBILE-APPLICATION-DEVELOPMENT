@@ -9,19 +9,37 @@
 import Foundation
 import MultipeerConnectivity
 
+/// Protocol for dealing with data and updating peers' information
 protocol PeerToPeerManagerDelegate: AnyObject {
+    /**
+     Deal with the data sent by peers
+     
+     - Parameter manager: The object who manage PeerToPeer network
+     - Parameter data: The data sent by peers
+     */
     func manager(_ manager: PeerToPeerManager, didReceive data: Data)
+    
+    /**
+     Update how many peers in the P2P network and their information
+     
+     - Parameter manager: The object who manage PeerToPeer network
+     */
     func updatePeers(_ manager: PeerToPeerManager)
 }
 
+/// The object who manage PeerToPeer network
 class PeerToPeerManager: NSObject {
+    /// Indicate the type of service
     static let serviceType = "todo-list"
     
+    /// Specify the delegate
     var delegate: PeerToPeerManagerDelegate?
-    var waitingList = [String]()
     
+    /// Identity in the P2P service
     let peerId = MCPeerID(displayName: "Zhaorui Liu")
+    /// To Publish an advertisement for a specific service that your app provides through the Multipeer Connectivity framework and notifies its delegate about invitations from nearby peers.
     private let serviceAdvertiser: MCNearbyServiceAdvertiser
+    /// To Search (by service type) for services offered by nearby devices
     private let serviceBrowser: MCNearbyServiceBrowser
     
     override init() {
@@ -40,17 +58,30 @@ class PeerToPeerManager: NSObject {
         serviceBrowser.stopBrowsingForPeers()
     }
     
+    /// Enable and manage communication among all peers
     lazy var session: MCSession = {
         let session = MCSession(peer: peerId, securityIdentity: nil, encryptionPreference: .none)
         session.delegate = self
         return session
     }()
     
+    /**
+     Invite a particular peer in an interval
+     
+     - Parameter peer: The peer who is going to be invited
+     - Parameter t: time interval
+     */
     func invite(peer: MCPeerID, timeout t: TimeInterval = 100) {
         print("Inviting \(peer)")
         serviceBrowser.invitePeer(peer, to: session, withContext: nil, timeout: t)
     }
     
+    /**
+     Send data to a group of peers
+     
+     - Parameter data: The data need to be sent
+     - Parameter toPeers: The array of peers
+     */
     func send(data: Data, toPeers: [MCPeerID]) {
         guard !toPeers.isEmpty else { return }
         do {
