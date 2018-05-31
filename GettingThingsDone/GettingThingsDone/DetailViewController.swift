@@ -16,6 +16,7 @@ class MyCell: UITableViewCell {
 
 class DetailViewController: UITableViewController, UITextFieldDelegate {
     let headers = ["TASK", "HISTORY", "COLLABORATORS", "PEERS"]
+    var displayName: String?
     
     var sectionOfSelectedItem: Int?
     var indexOfSelectedItem: Int?
@@ -24,8 +25,8 @@ class DetailViewController: UITableViewController, UITextFieldDelegate {
     var delegator: toDoListProtocol?
     
     var text: String?
-//    var historyRecords = [Record]()
-//    var collaberators = [String]()
+    var historyRecords = [Record]()
+    var collaborators = [String]()
     var peers: [MCPeerID]?
     
     override func viewDidLoad() {
@@ -48,12 +49,12 @@ class DetailViewController: UITableViewController, UITextFieldDelegate {
 //            self.tableView.reloadSections(IndexSet(integer: 1), with: .automatic)
 //        }
         
-//        guard let item = selectedItem else {
-//            return
-//        }
+        guard let item = selectedItem else {
+            return
+        }
         
-//        historyRecords = item.history
-//        collaberators = item.collaborators
+        historyRecords = item.history
+        collaborators = item.collaborators
     }
     
     func saveChanges() {
@@ -62,7 +63,7 @@ class DetailViewController: UITableViewController, UITextFieldDelegate {
         }
         
         if let t = text {
-            delegator?.save(sectionOfSelectedItem: sectionOfSelectedItem, indexOfSelectedItem: indexOfSelectedItem, selectedItem: selectedItem, task: t, history: historyRecords, collaborators: collaberators)
+            delegator?.save(sectionOfSelectedItem: sectionOfSelectedItem, indexOfSelectedItem: indexOfSelectedItem, selectedItem: selectedItem, task: t, history: historyRecords, collaborators: collaborators)
         }
         //tableView.reloadData()
         tableView.reloadSections(IndexSet(integer: 1), with: .automatic)
@@ -87,7 +88,7 @@ class DetailViewController: UITableViewController, UITextFieldDelegate {
         } else if section == 1 {
             return historyRecords.count
         } else if section == 2 {
-            return collaberators.count - 1
+            return collaborators.count - 1
         } else {
             guard let p = peers else {
                 return 0
@@ -131,7 +132,7 @@ class DetailViewController: UITableViewController, UITextFieldDelegate {
         } else if indexPath.section == 2 {
             cell = tableView.dequeueReusableCell(withIdentifier: "peerCell", for: indexPath) as! MyCell
 
-            cell.textLabel?.text = collaberators[indexPath.row + 1]
+            cell.textLabel?.text = collaborators[indexPath.row + 1]
         } else if indexPath.section == 3 {
             cell = tableView.dequeueReusableCell(withIdentifier: "peerCell", for: indexPath) as! MyCell
             cell.textLabel?.text = peers![indexPath.row].displayName
@@ -153,7 +154,7 @@ class DetailViewController: UITableViewController, UITextFieldDelegate {
         if indexPath?.section == 0 {
             text = textField.text
             if let t = text, let item = selectedItem, t != item.task && t != "" {
-                let renameRecord:Record = Record(description: "changed to \(t)")
+                let renameRecord:Record = Record(description: displayName! + " changed to \(t)")
                 historyRecords.insert(renameRecord, at: 0)
             }
         } else if indexPath?.section == 1 {
@@ -172,57 +173,12 @@ class DetailViewController: UITableViewController, UITextFieldDelegate {
         let cell = self.tableView(self.tableView, cellForRowAt: indexPath)
         let text = cell.textLabel?.text
         
-        if indexPath.section == 3 && collaberators.index(of: text!) == nil {
-            collaberators.insert(peers![indexPath.row].displayName, at: 1)
+        if indexPath.section == 3 && collaborators.index(of: text!) == nil {
+            collaborators.insert(peers![indexPath.row].displayName, at: 1)
             self.tableView.reloadData()
             saveChanges()
         }
     }
-    
-    /*
-     // Override to support conditional editing of the table view.
-     override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
-     // Return false if you do not want the specified item to be editable.
-     return true
-     }
-     */
-    
-    /*
-     // Override to support editing the table view.
-     override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCellEditingStyle, forRowAt indexPath: IndexPath) {
-     if editingStyle == .delete {
-     // Delete the row from the data source
-     tableView.deleteRows(at: [indexPath], with: .fade)
-     } else if editingStyle == .insert {
-     // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view
-     }
-     }
-     */
-    
-    /*
-     // Override to support rearranging the table view.
-     override func tableView(_ tableView: UITableView, moveRowAt fromIndexPath: IndexPath, to: IndexPath) {
-     
-     }
-     */
-    
-    /*
-     // Override to support conditional rearranging of the table view.
-     override func tableView(_ tableView: UITableView, canMoveRowAt indexPath: IndexPath) -> Bool {
-     // Return false if you do not want the item to be re-orderable.
-     return true
-     }
-     */
-    
-    /*
-     // MARK: - Navigation
-     
-     // In a storyboard-based application, you will often want to do a little preparation before navigation
-     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-     // Get the new view controller using segue.destinationViewController.
-     // Pass the selected object to the new view controller.
-     }
-     */
     
 }
 

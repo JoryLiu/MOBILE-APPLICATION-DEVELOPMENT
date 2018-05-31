@@ -33,16 +33,8 @@ class MasterViewController: UITableViewController, toDoListProtocol, PeerToPeerM
             let controllers = split.viewControllers
             detailViewController = (controllers[controllers.count-1] as! UINavigationController).topViewController as? DetailViewController
         }
-        // initialization()
+        
         peerToPeer.delegate = self
-    }
-    
-    func initialization() {
-        let addRecord = Record(description: "added")
-        var records = [Record]()
-        records.append(addRecord)
-        myTasks[0].append(ToDoItem(task: "Todo Item 1", history: records))
-        myTasks[0].append(ToDoItem(task: "Todo Item 2", history: records))
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -96,6 +88,10 @@ class MasterViewController: UITableViewController, toDoListProtocol, PeerToPeerM
             // Delete the row from the data source
             let i = indexPath.row
             let j = indexPath.section
+            
+            myTasks[j][i].history.insert(Record(description: peerToPeer.peerId.displayName + " deleted"), at: 0)
+            syncWithCollaborators(item: myTasks[j][i])
+            
             myTasks[j].remove(at: i)
             tableView.reloadData()
         } else if editingStyle == .insert {
@@ -112,19 +108,13 @@ class MasterViewController: UITableViewController, toDoListProtocol, PeerToPeerM
         let temp = myTasks[fromSection][fromRow]
         
         if fromSection == 0 && toSection == 1 {
-            let completeRecod: Record = Record(description: "completed")
+            let completeRecod: Record = Record(description: peerToPeer.peerId.displayName + " completed")
             temp.history.insert(completeRecod, at: 0)
             temp.isFinished = true
-            
-//            if let row = indexOfSelectedItem, let section = sectionOfSelectedItem {
-//                if row == fromRow && section == fromSection {
-//                    let notificationName = Notification.Name(rawValue: "SelectedItem Completed")
-//                    NotificationCenter.default.post(name: notificationName, object: self)
-//                }
-//            }
+
             syncWithCollaborators(item: temp)
         } else if fromSection == 1 && toSection == 0 {
-            let completeRecod: Record = Record(description: "restarted")
+            let completeRecod: Record = Record(description: peerToPeer.peerId.displayName + " restarted")
             temp.history.insert(completeRecod, at: 0)
             temp.isFinished = false
             syncWithCollaborators(item: temp)
@@ -160,6 +150,8 @@ class MasterViewController: UITableViewController, toDoListProtocol, PeerToPeerM
             dvc.sectionOfSelectedItem = i
             dvc.indexOfSelectedItem = indexOfSelectedItem
             dvc.selectedItem = myTasks[i][j]
+            dvc.peers = peerToPeer.session.connectedPeers
+            dvc.displayName = peerToPeer.peerId.displayName
         }
     }
     
@@ -195,7 +187,16 @@ class MasterViewController: UITableViewController, toDoListProtocol, PeerToPeerM
             for j in 0 ... myTasks[i].count - 1 {
                 if temp.id == myTasks[i][j].id {
                     if i == self.sectionOfSelectedItem && j == self.indexOfSelectedItem {
+                        let latestHistoryRecord = temp.history[0].description
+                        let latestHistoryRecordArr = latestHistoryRecord.split(separator: " ").map(String.init)
+                        
+                        if latestHistoryRecordArr.last == "deleted" {
+                            temp.collaborators.remove(at: 1)
+                        }
+                        self.detailViewController?.text = temp.task
                         self.detailViewController?.selectedItem = temp
+                        self.detailViewController?.historyRecords = temp.history
+                        self.detailViewController?.collaborators = temp.collaborators
                     }
                     
                     if (temp.isFinished && i == 1) || (!temp.isFinished && i == 0) {
@@ -244,7 +245,7 @@ class MasterViewController: UITableViewController, toDoListProtocol, PeerToPeerM
     }
     
     @IBAction func addNewTask(_ sender: UIBarButtonItem) {
-        let addRecord = Record(description: "added")
+        let addRecord = Record(description: peerToPeer.peerId.displayName + " added")
         var records = [Record]()
         records.append(addRecord)
         var collaborators = [String]()
