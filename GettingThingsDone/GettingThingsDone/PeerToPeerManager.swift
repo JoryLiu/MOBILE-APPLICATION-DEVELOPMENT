@@ -79,10 +79,12 @@ extension PeerToPeerManager: MCSessionDelegate {
         switch state.rawValue {
         case 0:
             print("SessionDidChange 'notConnected'")
+            delegate?.updatePeers(self)
         case 1:
             print("SessionDidChange 'connecting'")
         default:
             print("SessionDidChange 'connected'")
+            delegate?.updatePeers(self)
         }
     }
     
@@ -110,7 +112,6 @@ extension PeerToPeerManager: MCNearbyServiceBrowserDelegate {
         }
         print("Found \(peerID.displayName)")
         invite(peer: peerID)
-        delegate?.updatePeers(self)
     }
     
     func browser(_ browser: MCNearbyServiceBrowser, lostPeer peerID: MCPeerID) {

@@ -114,19 +114,29 @@ class MasterViewController: UITableViewController, toDoListProtocol, PeerToPeerM
         if fromSection == 0 && toSection == 1 {
             let completeRecod: Record = Record(description: "completed")
             temp.history.insert(completeRecod, at: 0)
+            temp.isFinished = true
             
-            if let row = indexOfSelectedItem, let section = sectionOfSelectedItem {
-                if row == fromRow && section == fromSection {
-                    let notificationName = Notification.Name(rawValue: "SelectedItem Completed")
-                    NotificationCenter.default.post(name: notificationName, object: self)
-                }
-            }
+//            if let row = indexOfSelectedItem, let section = sectionOfSelectedItem {
+//                if row == fromRow && section == fromSection {
+//                    let notificationName = Notification.Name(rawValue: "SelectedItem Completed")
+//                    NotificationCenter.default.post(name: notificationName, object: self)
+//                }
+//            }
+            syncWithCollaborators(item: temp)
+        } else if fromSection == 1 && toSection == 0 {
+            let completeRecod: Record = Record(description: "restarted")
+            temp.history.insert(completeRecod, at: 0)
+            temp.isFinished = false
             syncWithCollaborators(item: temp)
         }
         
         myTasks[fromSection].remove(at: fromRow)
         myTasks[toSection].insert(temp, at: toRow)
         tableView.reloadData()
+        
+        DispatchQueue.main.async {
+            self.detailViewController?.tableView.reloadData()
+        }
     }
     
     // MARK: - Segues
@@ -135,6 +145,8 @@ class MasterViewController: UITableViewController, toDoListProtocol, PeerToPeerM
         
         let navi = segue.destination as! UINavigationController
         let dvc = navi.topViewController as! DetailViewController
+        detailViewController = dvc
+        
         dvc.navigationItem.leftItemsSupplementBackButton = true
         dvc.navigationItem.leftBarButtonItem = splitViewController?.displayModeButtonItem
         dvc.delegator = self
@@ -175,27 +187,40 @@ class MasterViewController: UITableViewController, toDoListProtocol, PeerToPeerM
             }
         }
         var flag = false
+        
         for i in 0 ... 1 {
             if myTasks[i].isEmpty {
                 continue
             }
             for j in 0 ... myTasks[i].count - 1 {
-                if (temp.id == myTasks[i][j].id) {
-                    myTasks[i][j] = temp
-                    flag = true
+                if temp.id == myTasks[i][j].id {
+                    if i == self.sectionOfSelectedItem && j == self.indexOfSelectedItem {
+                        self.detailViewController?.selectedItem = temp
+                    }
+                    
+                    if (temp.isFinished && i == 1) || (!temp.isFinished && i == 0) {
+                        myTasks[i][j] = temp
+                        flag = true
+                    } else {
+                        myTasks[i].remove(at: j)
+                    }
                 }
             }
         }
         if !flag {
-            myTasks[0].insert(temp, at: 0)
+            myTasks[temp.isFinished ? 1 : 0].insert(temp, at: 0)
         }
-        tableView.reloadData()
-        detailViewController?.tableView.reloadData()
+        DispatchQueue.main.async {
+            self.tableView.reloadData()
+            self.detailViewController?.tableView.reloadData()
+        }
     }
     
     func updatePeers(_ manager: PeerToPeerManager) {
         detailViewController?.peers = peerToPeer.session.connectedPeers
-        detailViewController?.tableView.reloadData()
+        DispatchQueue.main.async {
+            self.detailViewController?.tableView.reloadSections(IndexSet(integer: 3), with: .automatic)
+        }
     }
     
     // MARK: - Data

@@ -25,12 +25,14 @@ class ToDoItem: Codable {
     var history: [Record]
     var collaborators: [String]
     let id: String
+    var isFinished: Bool
     
     init(task: String, history: [Record] = [Record](),
-         collaborators: [String] = [String](), id: String = UUID().uuidString) {
+         collaborators: [String] = [String](), id: String = UUID().uuidString, isFinished: Bool = false) {
         self.task = task
         self.history = history
         self.collaborators = collaborators
         self.id = id
+        self.isFinished = isFinished
     }
 }

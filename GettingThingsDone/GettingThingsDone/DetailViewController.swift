@@ -24,8 +24,8 @@ class DetailViewController: UITableViewController, UITextFieldDelegate {
     var delegator: toDoListProtocol?
     
     var text: String?
-    var historyRecords = [Record]()
-    var collaberators = [String]()
+//    var historyRecords = [Record]()
+//    var collaberators = [String]()
     var peers: [MCPeerID]?
     
     override func viewDidLoad() {
@@ -41,19 +41,19 @@ class DetailViewController: UITableViewController, UITextFieldDelegate {
             text = t
         }
         
-        let notificationName = Notification.Name(rawValue: "SelectedItem Completed")
-        NotificationCenter.default.addObserver(forName: notificationName, object: nil, queue: nil) { _ in
-            self.historyRecords.insert(Record(description: "completed"), at: 0)
-            //self.tableView.reloadData()
-            self.tableView.reloadSections(IndexSet(integer: 1), with: .automatic)
-        }
+//        let notificationName = Notification.Name(rawValue: "SelectedItem Completed")
+//        NotificationCenter.default.addObserver(forName: notificationName, object: nil, queue: nil) { _ in
+//            self.historyRecords.insert(Record(description: "completed"), at: 0)
+//            //self.tableView.reloadData()
+//            self.tableView.reloadSections(IndexSet(integer: 1), with: .automatic)
+//        }
         
-        guard let item = selectedItem else {
-            return
-        }
+//        guard let item = selectedItem else {
+//            return
+//        }
         
-        historyRecords = item.history
-        collaberators = item.collaborators
+//        historyRecords = item.history
+//        collaberators = item.collaborators
     }
     
     func saveChanges() {
